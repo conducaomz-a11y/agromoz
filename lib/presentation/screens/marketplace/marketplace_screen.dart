@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/repositories/product_repository.dart';
 import '../../../providers/base_view_state.dart';
 import '../../../providers/marketplace_provider.dart';
 import '../../../routes/app_router.dart';
