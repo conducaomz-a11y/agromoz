@@ -5,7 +5,7 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  static const String baseUrl = 'https://api.agromoz.co.mz/v1';
+  static const String baseUrl = 'https://agromoz.com/appapi/v1';
 
   // ── Auth ──────────────────────────────────────────────
   static const String login = '/login';
