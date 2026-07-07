@@ -5,6 +5,8 @@ import '../models/banner_model.dart';
 import '../models/category_model.dart';
 import '../models/paginated_response.dart';
 import '../models/product_model.dart';
+import '../models/article_model.dart';
+import '../models/user_model.dart';
 
 /// Filter object passed from the Marketplace UI down to the API query string.
 class ProductFilters {
@@ -148,6 +150,30 @@ class ProductRepository {
 
   Future<void> deleteListing(String productId) =>
       _client.delete<void>(ApiEndpoints.productDetail(productId));
+
+  /// Artigos publicados no blog do site (Home → "Notícias e dicas").
+  Future<List<ArticleModel>> fetchArticles({int limit = 10}) async {
+    final data = await _client.get<Map<String, dynamic>>(
+      ApiEndpoints.articles,
+      query: {'limit': limit},
+    );
+    return (data['data'] as List<dynamic>? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(ArticleModel.fromJson)
+        .toList();
+  }
+
+  /// Empresas activas do site (Home → "Empresas em destaque").
+  Future<List<UserModel>> fetchCompanies({int limit = 10}) async {
+    final data = await _client.get<Map<String, dynamic>>(
+      ApiEndpoints.companies,
+      query: {'limit': limit},
+    );
+    return (data['data'] as List<dynamic>? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(UserModel.fromJson)
+        .toList();
+  }
 
   Future<List<ProductModel>> _fetchList(String path) async {
     final data = await _client.get<Map<String, dynamic>>(path);

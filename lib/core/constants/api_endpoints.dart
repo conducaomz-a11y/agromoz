@@ -43,4 +43,6 @@ class ApiEndpoints {
   static const String search = '/search';
   static const String searchSuggestions = '/search/suggestions';
   static const String deviceToken = '/devices'; // FCM registration
+  static const String articles = '/articles'; // blog do site
+  static const String companies = '/companies'; // empresas em destaque
 }
