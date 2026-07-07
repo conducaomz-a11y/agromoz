@@ -63,13 +63,13 @@ class _SearchScreenState extends State<SearchScreen> {
                     .map((s) => ListTile(
                           dense: true,
                           leading: const Icon(Icons.north_west_rounded,
-                              size: 18),
+                              size: 18,),
                           title: Text(s),
                           onTap: () {
                             _controller.text = s;
                             provider.submit(s);
                           },
-                        ))
+                        ),)
                     .toList(),
               ),
             ),
@@ -108,7 +108,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       AppRouter.marketplace,
                                       arguments: c.id,
                                     ),
-                                  ))
+                                  ),)
                               .toList(),
                         ),
                       ),
@@ -121,14 +121,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         ...provider.result!.companies,
                       ].map((u) => ListTile(
                             leading: UserAvatar(
-                                name: u.name, imageUrl: u.avatarUrl),
+                                name: u.name, imageUrl: u.avatarUrl,),
                             title: Text(u.name,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w600)),
+                                    fontWeight: FontWeight.w600,),),
                             subtitle: Text([
                               u.roleLabel,
                               if (u.province != null) u.province!,
-                            ].join(' · ')),
+                            ].join(' · '),),
                             trailing:
                                 const Icon(Icons.chevron_right_rounded),
                             onTap: () => Navigator.pushNamed(
@@ -136,7 +136,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               AppRouter.farmerProfile,
                               arguments: u.id,
                             ),
-                          )),
+                          ),),
                     ],
                     if (provider.result!.products.isNotEmpty) ...[
                       const SectionHeader(title: 'Produtos'),

@@ -110,20 +110,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _role,
+                  initialValue: _role,
                   decoration: const InputDecoration(
                     labelText: 'Eu sou',
                     prefixIcon: Icon(Icons.badge_outlined),
                   ),
                   items: _roles.entries
                       .map((e) => DropdownMenuItem(
-                          value: e.key, child: Text(e.value)))
+                          value: e.key, child: Text(e.value),),)
                       .toList(),
                   onChanged: (v) => setState(() => _role = v ?? 'farmer'),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _province,
+                  initialValue: _province,
                   decoration: const InputDecoration(
                     labelText: 'Província',
                     prefixIcon: Icon(Icons.place_outlined),
@@ -144,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(_obscure
                           ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined),
+                          : Icons.visibility_off_outlined,),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),

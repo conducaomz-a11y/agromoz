@@ -60,7 +60,7 @@ class AuthProvider extends ChangeNotifier {
       _guard(() async => _user = await _repo.login(
             identifier: identifier,
             password: password,
-          )).then((ok) {
+          ),).then((ok) {
         if (ok) _status = AuthStatus.authenticated;
         notifyListeners();
         return ok;
@@ -81,7 +81,7 @@ class AuthProvider extends ChangeNotifier {
             password: password,
             role: role,
             province: province,
-          )).then((ok) {
+          ),).then((ok) {
         if (ok) _status = AuthStatus.authenticated;
         notifyListeners();
         return ok;

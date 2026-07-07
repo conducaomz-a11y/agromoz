@@ -44,7 +44,7 @@ class AppTheme {
         color: scheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_radius),
-          side: BorderSide(color: scheme.outlineVariant.withOpacity(.4)),
+          side: BorderSide(color: scheme.outlineVariant.withValues(alpha: .4)),
         ),
         clipBehavior: Clip.antiAlias,
         margin: EdgeInsets.zero,
@@ -86,7 +86,7 @@ class AppTheme {
       ),
       chipTheme: base.chipTheme.copyWith(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        side: BorderSide(color: scheme.outlineVariant.withOpacity(.5)),
+        side: BorderSide(color: scheme.outlineVariant.withValues(alpha: .5)),
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 68,

@@ -30,7 +30,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final _input = TextEditingController();
   final _scroll = ScrollController();
-  bool _showTyping = false;
+  final bool _showTyping = false;
 
   @override
   void initState() {
@@ -187,7 +187,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: const InputDecoration(
                         hintText: 'Escreva uma mensagem…',
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                            horizontal: 16, vertical: 12,),
                       ),
                       onSubmitted: (_) => _send(),
                     ),
@@ -255,7 +255,7 @@ class _MessageBubble extends StatelessWidget {
               )
             else
               Text(message.text ?? '',
-                  style: TextStyle(color: fg, height: 1.35)),
+                  style: TextStyle(color: fg, height: 1.35),),
             const SizedBox(height: 3),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -266,7 +266,7 @@ class _MessageBubble extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10,
                       color: mine
-                          ? Colors.white.withOpacity(.75)
+                          ? Colors.white.withValues(alpha: .75)
                           : scheme.onSurfaceVariant,
                     ),
                   ),
@@ -279,7 +279,7 @@ class _MessageBubble extends StatelessWidget {
                             ? Icons.done_all_rounded
                             : Icons.done_rounded,
                     size: 13,
-                    color: Colors.white.withOpacity(.85),
+                    color: Colors.white.withValues(alpha: .85),
                   ),
                 ],
               ],

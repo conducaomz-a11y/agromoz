@@ -43,10 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text('Olá, ${user?.name.split(' ').first ?? 'visitante'} 👋',
                 style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w800)),
+                    ?.copyWith(fontWeight: FontWeight.w800),),
             Text('O que procura hoje?',
                 style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),),
           ],
         ),
         actions: [

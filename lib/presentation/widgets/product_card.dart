@@ -76,7 +76,7 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Icon(Icons.place_outlined,
                             size: 13,
-                            color: theme.colorScheme.onSurfaceVariant),
+                            color: theme.colorScheme.onSurfaceVariant,),
                         const SizedBox(width: 2),
                         Expanded(
                           child: Text(
@@ -137,7 +137,7 @@ class ProductListTile extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyLarge
-                            ?.copyWith(fontWeight: FontWeight.w600)),
+                            ?.copyWith(fontWeight: FontWeight.w600),),
                     const SizedBox(height: 4),
                     Text(
                       Formatters.price(product.price),

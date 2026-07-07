@@ -78,7 +78,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                         const SizedBox(height: 12),
                         Text(farmer.name,
                             style: theme.textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w800)),
+                                ?.copyWith(fontWeight: FontWeight.w800),),
                         Text(
                           [
                             farmer.roleLabel,
@@ -105,7 +105,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                           const SizedBox(height: 12),
                           Text(farmer.bio!,
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.bodyMedium),
+                              style: theme.textTheme.bodyMedium,),
                         ],
                         const SizedBox(height: 16),
                         FilledButton.icon(
@@ -193,7 +193,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                                           child: Text(r.authorName,
                                               style: const TextStyle(
                                                   fontWeight:
-                                                      FontWeight.w700)),
+                                                      FontWeight.w700,),),
                                         ),
                                         if (r.createdAt != null)
                                           Text(

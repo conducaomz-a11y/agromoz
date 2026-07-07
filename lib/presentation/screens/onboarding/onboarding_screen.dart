@@ -78,19 +78,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           radius: 72,
                           backgroundColor: theme.colorScheme.primaryContainer,
                           child: Icon(s.icon,
-                              size: 72, color: theme.colorScheme.primary),
+                              size: 72, color: theme.colorScheme.primary,),
                         ),
                         const SizedBox(height: 40),
                         Text(s.title,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.w800)),
+                                ?.copyWith(fontWeight: FontWeight.w800),),
                         const SizedBox(height: 16),
                         Text(s.body,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
-                            )),
+                            ),),
                       ],
                     ),
                   );

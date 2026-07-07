@@ -35,7 +35,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       SnackBar(
         content: Text(ok
             ? 'Palavra-passe alterada com sucesso.'
-            : auth.error ?? 'Falha ao alterar a palavra-passe.'),
+            : auth.error ?? 'Falha ao alterar a palavra-passe.',),
       ),
     );
     if (ok) Navigator.pop(context);
@@ -63,7 +63,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(_obscure
                           ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined),
+                          : Icons.visibility_off_outlined,),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),

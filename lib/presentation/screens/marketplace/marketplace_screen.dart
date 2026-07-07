@@ -79,7 +79,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             onPressed: provider.toggleLayout,
             icon: Icon(provider.isGridView
                 ? Icons.view_list_rounded
-                : Icons.grid_view_rounded),
+                : Icons.grid_view_rounded,),
           ),
           IconButton(
             onPressed: _openFilters,
@@ -129,7 +129,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   itemBuilder: (_, i) {
                     if (i >= provider.products.length) {
                       return const ShimmerBox(
-                          height: double.infinity, radius: 16);
+                          height: double.infinity, radius: 16,);
                     }
                     final p = provider.products[i];
                     return ProductCard(

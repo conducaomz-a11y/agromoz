@@ -82,11 +82,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 return ListTile(
                   tileColor: n.isRead
                       ? null
-                      : theme.colorScheme.primaryContainer.withOpacity(.25),
+                      : theme.colorScheme.primaryContainer.withValues(alpha: .25),
                   leading: CircleAvatar(
                     backgroundColor: theme.colorScheme.primaryContainer,
                     child: Icon(_iconFor(n.type),
-                        color: theme.colorScheme.primary),
+                        color: theme.colorScheme.primary,),
                   ),
                   title: Text(
                     n.title,
@@ -98,11 +98,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   subtitle: n.body == null
                       ? null
                       : Text(n.body!,
-                          maxLines: 2, overflow: TextOverflow.ellipsis),
+                          maxLines: 2, overflow: TextOverflow.ellipsis,),
                   trailing: n.createdAt == null
                       ? null
                       : Text(Formatters.timeAgo(n.createdAt!),
-                          style: theme.textTheme.bodySmall),
+                          style: theme.textTheme.bodySmall,),
                   onTap: () {
                     if (n.type == 'product' && n.targetId != null) {
                       Navigator.pushNamed(

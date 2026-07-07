@@ -122,7 +122,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 Text(product.title,
                     style: theme.textTheme.headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.w800)),
+                        ?.copyWith(fontWeight: FontWeight.w800),),
                 const SizedBox(height: 8),
                 Text(
                   Formatters.price(product.price) +
@@ -150,7 +150,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                       label: Text(product.isAvailable
                           ? 'Disponível'
-                          : 'Indisponível'),
+                          : 'Indisponível',),
                     ),
                     if (product.locationLabel.isNotEmpty)
                       Chip(
@@ -170,13 +170,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 16),
                   Text('Descrição',
                       style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700)),
+                          ?.copyWith(fontWeight: FontWeight.w700),),
                   const SizedBox(height: 6),
                   Text(product.description!,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: 1.5,
                         color: theme.colorScheme.onSurfaceVariant,
-                      )),
+                      ),),
                 ],
                 // ── Seller card ─────────────────────────
                 if (product.seller != null) ...[
@@ -194,11 +194,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                       title: Text(product.seller!.name,
                           style:
-                              const TextStyle(fontWeight: FontWeight.w700)),
+                              const TextStyle(fontWeight: FontWeight.w700),),
                       subtitle: Row(
                         children: [
                           RatingStars(
-                              rating: product.seller!.rating, size: 14),
+                              rating: product.seller!.rating, size: 14,),
                           const SizedBox(width: 6),
                           Text('(${product.seller!.reviewCount})'),
                         ],
