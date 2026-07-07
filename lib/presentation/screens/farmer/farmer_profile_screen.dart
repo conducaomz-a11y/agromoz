@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/utils/formatters.dart';
+import '../../../data/models/farmer_details.dart';
 import '../../../data/models/product_model.dart';
 import '../../../data/models/review_model.dart';
-import '../../../data/models/user_model.dart';
 import '../../../data/repositories/farmer_repository.dart';
 import '../../../routes/app_router.dart';
+import '../../widgets/app_network_image.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/rating_stars.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/user_avatar.dart';
 
+/// Perfil público do Fornecedor (empresa do site) com paridade total:
+/// capa, logo, descrição, contactos, WhatsApp, website, endereço,
+/// horário, galeria de fotos, produtos e avaliações.
 class FarmerProfileScreen extends StatefulWidget {
   const FarmerProfileScreen({super.key, required this.farmerId});
 
@@ -22,7 +27,7 @@ class FarmerProfileScreen extends StatefulWidget {
 
 class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   final _repo = FarmerRepository();
-  late Future<(UserModel, List<ProductModel>, List<ReviewModel>)> _future;
+  late Future<(FarmerDetails, List<ProductModel>, List<ReviewModel>)> _future;
 
   @override
   void initState() {
@@ -30,24 +35,51 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
     _future = _load();
   }
 
-  Future<(UserModel, List<ProductModel>, List<ReviewModel>)> _load() async {
+  Future<(FarmerDetails, List<ProductModel>, List<ReviewModel>)>
+      _load() async {
     final results = await Future.wait([
       _repo.fetchFarmer(widget.farmerId),
       _repo.fetchFarmerProducts(widget.farmerId),
       _repo.fetchReviews(widget.farmerId),
     ]);
     return (
-      results[0] as UserModel,
+      results[0] as FarmerDetails,
       results[1] as List<ProductModel>,
       results[2] as List<ReviewModel>,
+    );
+  }
+
+  Future<void> _launch(Uri uri) async {
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Não foi possível abrir.')),
+        );
+      }
+    }
+  }
+
+  void _openMaps(FarmerDetails d) {
+    final query = (d.latitude != null && d.longitude != null)
+        ? '${d.latitude},${d.longitude}'
+        : Uri.encodeComponent(
+            [d.address, d.user.district, d.user.province]
+                .whereType<String>()
+                .join(', '),
+          );
+    _launch(
+      Uri.parse('https://www.google.com/maps/search/?api=1&query=$query'),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      appBar: AppBar(title: const Text('Perfil do Fornecedor')),
       body: FutureBuilder(
         future: _future,
         builder: (context, snapshot) {
@@ -60,68 +92,250 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
               onRetry: () => setState(() => _future = _load()),
             );
           }
-          final (farmer, products, reviews) = snapshot.data!;
+          final (details, products, reviews) = snapshot.data!;
+          final farmer = details.user;
           return DefaultTabController(
             length: 2,
             child: NestedScrollView(
               headerSliverBuilder: (_, __) => [
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        UserAvatar(
-                          name: farmer.name,
-                          imageUrl: farmer.avatarUrl,
-                          radius: 44,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(farmer.name,
-                            style: theme.textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w800)),
-                        Text(
-                          [
-                            farmer.roleLabel,
-                            if (farmer.province != null) farmer.province!,
-                          ].join(' · '),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    children: [
+                      // ── Capa + logo sobreposto (como no site) ──
+                      SizedBox(
+                        height: 176,
+                        child: Stack(
+                          clipBehavior: Clip.none,
                           children: [
-                            RatingStars(rating: farmer.rating),
-                            const SizedBox(width: 6),
-                            Text(
-                              '${farmer.rating.toStringAsFixed(1)} · ${farmer.reviewCount} avaliações',
-                              style: theme.textTheme.bodySmall,
+                            SizedBox(
+                              height: 140,
+                              width: double.infinity,
+                              child: details.coverUrl != null &&
+                                      details.coverUrl!.isNotEmpty
+                                  ? AppNetworkImage(url: details.coverUrl)
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            scheme.primary,
+                                            scheme.primary.withOpacity(.6),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: theme.scaffoldBackgroundColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: UserAvatar(
+                                    name: farmer.name,
+                                    imageUrl: farmer.avatarUrl,
+                                    radius: 36,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        if (farmer.bio != null &&
-                            farmer.bio!.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Text(farmer.bio!,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                        child: Column(
+                          children: [
+                            Text(farmer.name,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w800)),
+                            Text(
+                              [
+                                farmer.roleLabel,
+                                if (farmer.district != null &&
+                                    farmer.district!.isNotEmpty)
+                                  farmer.district!,
+                                if (farmer.province != null &&
+                                    farmer.province!.isNotEmpty)
+                                  farmer.province!,
+                              ].join(' · '),
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.bodyMedium),
-                        ],
-                        const SizedBox(height: 16),
-                        FilledButton.icon(
-                          onPressed: () => Navigator.pushNamed(
-                            context,
-                            AppRouter.chat,
-                            arguments: ChatArgs(
-                              conversationId: 'seller_${farmer.id}',
-                              otherUser: farmer,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
                             ),
-                          ),
-                          icon: const Icon(Icons.chat_bubble_outline_rounded),
-                          label: const Text('Contactar'),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RatingStars(rating: farmer.rating),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '${farmer.rating.toStringAsFixed(1)} · ${farmer.reviewCount} avaliações · ${details.views} visitas',
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                            if (farmer.bio != null &&
+                                farmer.bio!.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              Text(farmer.bio!,
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium),
+                            ],
+                            const SizedBox(height: 16),
+                            // ── Acções: Ligar · WhatsApp · Mensagem ──
+                            Row(
+                              children: [
+                                if (farmer.phone != null &&
+                                    farmer.phone!.isNotEmpty)
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => _launch(
+                                          Uri.parse('tel:${farmer.phone}')),
+                                      icon: const Icon(Icons.call_rounded,
+                                          size: 18),
+                                      label: const Text('Ligar'),
+                                    ),
+                                  ),
+                                if (details.whatsapp != null &&
+                                    details.whatsapp!.isNotEmpty) ...[
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        final digits = details.whatsapp!
+                                            .replaceAll(RegExp(r'\D'), '');
+                                        _launch(Uri.parse(
+                                            'https://wa.me/$digits'));
+                                      },
+                                      icon: const Icon(Icons.chat_rounded,
+                                          size: 18),
+                                      label: const Text('WhatsApp'),
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: FilledButton.icon(
+                                    onPressed: () => Navigator.pushNamed(
+                                      context,
+                                      AppRouter.chat,
+                                      arguments: ChatArgs(
+                                        conversationId:
+                                            'seller_${farmer.id}',
+                                        otherUser: farmer,
+                                      ),
+                                    ),
+                                    icon: const Icon(
+                                        Icons.chat_bubble_outline_rounded,
+                                        size: 18),
+                                    label: const Text('Mensagem'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // ── Informações (endereço, horário, web) ──
+                            if (details.address != null ||
+                                details.schedule != null ||
+                                details.website != null ||
+                                farmer.email != null) ...[
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: scheme.surfaceContainerHighest
+                                      .withOpacity(.35),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Column(
+                                  children: [
+                                    if (details.address != null &&
+                                        details.address!.isNotEmpty)
+                                      _InfoTile(
+                                        icon: Icons.place_outlined,
+                                        text: details.address!,
+                                        onTap: () => _openMaps(details),
+                                      ),
+                                    if (details.schedule != null &&
+                                        details.schedule!.isNotEmpty)
+                                      _InfoTile(
+                                        icon: Icons.schedule_rounded,
+                                        text: details.schedule!,
+                                      ),
+                                    if (details.website != null &&
+                                        details.website!.isNotEmpty)
+                                      _InfoTile(
+                                        icon: Icons.language_rounded,
+                                        text: details.website!,
+                                        onTap: () {
+                                          var url = details.website!;
+                                          if (!url.startsWith('http')) {
+                                            url = 'https://$url';
+                                          }
+                                          _launch(Uri.parse(url));
+                                        },
+                                      ),
+                                    if (farmer.email != null &&
+                                        farmer.email!.isNotEmpty)
+                                      _InfoTile(
+                                        icon: Icons.mail_outline_rounded,
+                                        text: farmer.email!,
+                                        onTap: () => _launch(Uri.parse(
+                                            'mailto:${farmer.email}')),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            // ── Galeria de fotos da empresa ──
+                            if (details.gallery.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text('Galeria',
+                                    style: theme.textTheme.titleSmall
+                                        ?.copyWith(
+                                            fontWeight: FontWeight.w800)),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                height: 96,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: details.gallery.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 8),
+                                  itemBuilder: (_, i) {
+                                    final img = details.gallery[i];
+                                    return InkWell(
+                                      onTap: () => _showPhoto(context, img),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        child: SizedBox(
+                                          width: 120,
+                                          height: 96,
+                                          child:
+                                              AppNetworkImage(url: img.url),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 SliverPersistentHeader(
@@ -220,6 +434,55 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
           );
         },
       ),
+    );
+  }
+
+  void _showPhoto(BuildContext context, GalleryImage img) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => Dialog(
+        insetPadding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
+              child: InteractiveViewer(
+                child: AppNetworkImage(url: img.url, fit: BoxFit.contain),
+              ),
+            ),
+            if (img.caption != null && img.caption!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(img.caption!),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoTile extends StatelessWidget {
+  const _InfoTile({required this.icon, required this.text, this.onTap});
+
+  final IconData icon;
+  final String text;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ListTile(
+      dense: true,
+      onTap: onTap,
+      leading: Icon(icon, size: 20, color: theme.colorScheme.primary),
+      title: Text(text, style: theme.textTheme.bodyMedium),
+      trailing: onTap != null
+          ? Icon(Icons.open_in_new_rounded,
+              size: 14, color: theme.colorScheme.onSurfaceVariant)
+          : null,
     );
   }
 }

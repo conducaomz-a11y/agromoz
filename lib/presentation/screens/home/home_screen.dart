@@ -100,6 +100,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                 ),
+                // ── Artigos do blog do site ───────────────────────
+                if (home.articles.isNotEmpty) ...[
+                  const SectionHeader(title: 'Notícias e dicas'),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: home.articles.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (_, i) =>
+                        _ArticleCard(article: home.articles[i]),
+                  ),
+                ],
                 if (home.categories.isNotEmpty) ...[
                   const SectionHeader(title: 'Categorias'),
                   SizedBox(
@@ -131,27 +144,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.pushNamed(context, AppRouter.marketplace),
                   ),
                   _HorizontalProducts(products: home.featured),
-                ],
-                // ── Empresas do site (mesma base de dados) ────────
-                if (home.companies.isNotEmpty) ...[
-                  const SectionHeader(title: 'Empresas em destaque'),
-                  SizedBox(
-                    height: 150,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: home.companies.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (_, i) => _CompanyCard(
-                        company: home.companies[i],
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          AppRouter.farmerProfile,
-                          arguments: home.companies[i].id,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
                 if (home.latest.isNotEmpty) ...[
                   SectionHeader(
@@ -185,17 +177,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
-                // ── Artigos do blog do site ───────────────────────
-                if (home.articles.isNotEmpty) ...[
-                  const SectionHeader(title: 'Notícias e dicas'),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: home.articles.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (_, i) =>
-                        _ArticleCard(article: home.articles[i]),
+                // ── Empresas do site (mesma base de dados) ────────
+                if (home.companies.isNotEmpty) ...[
+                  const SectionHeader(title: 'Empresas em destaque'),
+                  SizedBox(
+                    height: 150,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: home.companies.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (_, i) => _CompanyCard(
+                        company: home.companies[i],
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRouter.farmerProfile,
+                          arguments: home.companies[i].id,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),

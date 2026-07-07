@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/notification_provider.dart';
 import 'home/home_screen.dart';
-import 'marketplace/marketplace_screen.dart';
+import 'fornecedores/fornecedores_screen.dart';
 import 'messages/conversations_screen.dart';
 import 'profile/profile_screen.dart';
 import 'search/search_screen.dart';
 
-/// Bottom navigation shell: Home · Marketplace · Search · Messages · Profile.
+/// Bottom navigation shell: Início · Fornecedores · Pesquisar · Mensagens · Perfil.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -22,7 +22,7 @@ class _MainShellState extends State<MainShell> {
 
   static const _screens = [
     HomeScreen(),
-    MarketplaceScreen(),
+    FornecedoresScreen(),
     SearchScreen(),
     ConversationsScreen(),
     ProfileScreen(),
@@ -57,7 +57,7 @@ class _MainShellState extends State<MainShell> {
           const NavigationDestination(
             icon: Icon(Icons.storefront_outlined),
             selectedIcon: Icon(Icons.storefront_rounded),
-            label: 'Mercado',
+            label: 'Fornecedores',
           ),
           const NavigationDestination(
             icon: Icon(Icons.search_rounded),

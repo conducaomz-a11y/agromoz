@@ -175,6 +175,26 @@ class ProductRepository {
         .toList();
   }
 
+  /// Directório de Fornecedores (tab), com filtros e paginação.
+  Future<PaginatedResponse<UserModel>> fetchCompaniesPage({
+    int page = 1,
+    String? q,
+    String? tipo,
+    String? province,
+  }) async {
+    final data = await _client.get<Map<String, dynamic>>(
+      ApiEndpoints.companies,
+      query: {
+        'page': page,
+        'per_page': 20,
+        if (q != null && q.isNotEmpty) 'q': q,
+        if (tipo != null && tipo.isNotEmpty) 'tipo': tipo,
+        if (province != null && province.isNotEmpty) 'province': province,
+      },
+    );
+    return PaginatedResponse.fromJson(data, UserModel.fromJson);
+  }
+
   Future<List<ProductModel>> _fetchList(String path) async {
     final data = await _client.get<Map<String, dynamic>>(path);
     return (data['data'] as List<dynamic>? ?? [])

@@ -1,7 +1,7 @@
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
+import '../models/farmer_details.dart';
 import '../models/review_model.dart';
-import '../models/user_model.dart';
 import '../models/product_model.dart';
 
 class FarmerRepository {
@@ -9,10 +9,13 @@ class FarmerRepository {
       : _client = client ?? ApiClient.instance;
   final ApiClient _client;
 
-  Future<UserModel> fetchFarmer(String id) async {
+  /// Perfil completo do Fornecedor — inclui capa, contactos e galeria.
+  Future<FarmerDetails> fetchFarmer(String id) async {
     final data = await _client
         .get<Map<String, dynamic>>(ApiEndpoints.farmerProfile(id));
-    return UserModel.fromJson((data['data'] ?? data) as Map<String, dynamic>);
+    return FarmerDetails.fromJson(
+      (data['data'] ?? data) as Map<String, dynamic>,
+    );
   }
 
   Future<List<ProductModel>> fetchFarmerProducts(String id) async {
