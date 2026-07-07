@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../data/models/article_model.dart';
+import '../../../data/models/user_model.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../../providers/base_view_state.dart';
@@ -96,6 +100,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                 ),
+                // ── Artigos do blog do site ───────────────────────
+                if (home.articles.isNotEmpty) ...[
+                  const SectionHeader(title: 'Notícias e dicas'),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: home.articles.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (_, i) =>
+                        _ArticleCard(article: home.articles[i]),
+                  ),
+                ],
                 if (home.categories.isNotEmpty) ...[
                   const SectionHeader(title: 'Categorias'),
                   SizedBox(
@@ -156,6 +173,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         AppRouter.productDetail,
                         arguments: home.recommended[i].id,
+                      ),
+                    ),
+                  ),
+                ],
+                // ── Empresas do site (mesma base de dados) ────────
+                if (home.companies.isNotEmpty) ...[
+                  const SectionHeader(title: 'Empresas em destaque'),
+                  SizedBox(
+                    height: 150,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: home.companies.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (_, i) => _CompanyCard(
+                        company: home.companies[i],
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRouter.farmerProfile,
+                          arguments: home.companies[i].id,
+                        ),
                       ),
                     ),
                   ),
@@ -263,6 +301,168 @@ class _HomeShimmer extends StatelessWidget {
         SizedBox(height: 12),
         ProductGridShimmer(count: 4),
       ],
+    );
+  }
+}
+
+
+/// Cartão horizontal de empresa (logo + nome + província).
+/// Toque abre o perfil público (mesmo ecrã do vendedor).
+class _CompanyCard extends StatelessWidget {
+  const _CompanyCard({required this.company, required this.onTap});
+
+  final UserModel company;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 132,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest.withOpacity(.35),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: scheme.outlineVariant.withOpacity(.5)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: scheme.primaryContainer,
+              backgroundImage:
+                  company.avatarUrl != null && company.avatarUrl!.isNotEmpty
+                      ? NetworkImage(company.avatarUrl!)
+                      : null,
+              child: company.avatarUrl == null || company.avatarUrl!.isEmpty
+                  ? Icon(Icons.storefront_rounded, color: scheme.primary)
+                  : null,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              company.name,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelMedium
+                  ?.copyWith(fontWeight: FontWeight.w700, height: 1.15),
+            ),
+            if (company.province != null && company.province!.isNotEmpty)
+              Text(
+                company.province!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Cartão de artigo do blog — abre o artigo no site, no navegador.
+class _ArticleCard extends StatelessWidget {
+  const _ArticleCard({required this.article});
+
+  final ArticleModel article;
+
+  Future<void> _open() async {
+    final uri = Uri.tryParse(article.url);
+    if (uri != null) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return InkWell(
+      onTap: _open,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: scheme.outlineVariant.withOpacity(.5)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 96,
+                height: 96,
+                child: article.imageUrl != null && article.imageUrl!.isNotEmpty
+                    ? AppNetworkImage(url: article.imageUrl)
+                    : Container(
+                        color: scheme.primaryContainer,
+                        child:
+                            Icon(Icons.article_rounded, color: scheme.primary),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (article.categoryName != null)
+                    Text(
+                      article.categoryName!.toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: scheme.primary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: .6,
+                      ),
+                    ),
+                  const SizedBox(height: 2),
+                  Text(
+                    article.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700, height: 1.25),
+                  ),
+                  if (article.excerpt != null &&
+                      article.excerpt!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      article.excerpt!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.open_in_new_rounded,
+                          size: 13, color: scheme.onSurfaceVariant),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Ler no site',
+                        style: theme.textTheme.labelSmall
+                            ?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
