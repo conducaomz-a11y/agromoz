@@ -6,7 +6,16 @@ Aplicação móvel Flutter que liga **agricultores, compradores, empresas agríc
 
 ---
 
-## ✨ O que há de novo na v2
+## ✨ O que há de novo na v3 (Julho 2026)
+
+- **Aba Fornecedores** no menu: directório de empresas com pesquisa e filtro por tipo (Agricultores, Horticultores, Avicultores, Cunicultores, Fornecedores de Insumos), com nota, nº de produtos e acesso ao perfil.
+- **Home como long page de venda**: pesquisa → banners → categorias (só as que têm produtos) → produtos em destaque → "Notícias e dicas" (artigos abrem na app) → últimos anúncios → recomendados → CTA "Cria a tua página de negócio".
+- **Artigo único redesenhado**: capa com gradiente e título sobreposto, chip de categoria, data + tempo de leitura, tipografia editorial (h2 em verde, citações com barra lateral) e botão de partilha.
+- **Editar Página de Negócio**: novo ecrã para mudar logo, capa, descrição, contactos, categorias e localização (botão "Editar Página" no dashboard).
+- **Wizard corrigido**: se a API não responder, os 5 tipos de perfil aparecem na mesma (fallback local) — nunca ficas preso no passo 1.
+- API: nova rota `GET /farmers` (lista pública de empresas com `?type`, `?q`, `?province`).
+
+## ✨ O que havia de novo na v2
 
 - **Registo igual ao site**: nome, e-mail, telefone, província, senha + confirmação, checkbox "🌱 Quero criar uma página de negócio" e aceitação de Termos. A conta fica por confirmar até introduzir o **código de 6 dígitos enviado por e-mail** (mesmo mecanismo do site).
 - **Fluxo profissional completo dentro da app**:
