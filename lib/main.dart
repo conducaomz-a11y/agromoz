@@ -10,6 +10,7 @@ import 'providers/home_provider.dart';
 import 'providers/marketplace_provider.dart';
 import 'providers/notification_provider.dart';
 import 'providers/product_detail_provider.dart';
+import 'providers/suppliers_provider.dart';
 import 'providers/theme_provider.dart';
 
 Future<void> main() async {
@@ -29,6 +30,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => ArticlesProvider()),
         ChangeNotifierProvider(create: (_) => BusinessProvider()),
+        ChangeNotifierProvider(create: (_) => SuppliersProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const AgroMozApp(),

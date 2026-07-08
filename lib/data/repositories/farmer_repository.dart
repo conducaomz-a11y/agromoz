@@ -1,5 +1,6 @@
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
+import '../models/paginated_response.dart';
 import '../models/review_model.dart';
 import '../models/user_model.dart';
 import '../models/product_model.dart';
@@ -8,6 +9,23 @@ class FarmerRepository {
   FarmerRepository({ApiClient? client})
       : _client = client ?? ApiClient.instance;
   final ApiClient _client;
+
+  /// Lista pública de fornecedores/empresas (com filtro por tipo e pesquisa).
+  Future<PaginatedResponse<UserModel>> fetchFarmers({
+    int page = 1,
+    String? type,
+    String? query,
+  }) async {
+    final data = await _client.get<Map<String, dynamic>>(
+      ApiEndpoints.farmers,
+      query: {
+        'page': page,
+        if (type != null) 'type': type,
+        if (query != null && query.isNotEmpty) 'q': query,
+      },
+    );
+    return PaginatedResponse.fromJson(data, UserModel.fromJson);
+  }
 
   Future<UserModel> fetchFarmer(String id) async {
     final data = await _client

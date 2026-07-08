@@ -60,7 +60,21 @@ class _BusinessWizardScreenState extends State<BusinessWizardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final types = await context.read<BusinessProvider>().loadTypes();
+      List<BusinessTypeModel> types = [];
+      try {
+        types = await context.read<BusinessProvider>().loadTypes();
+      } catch (_) {/* usa o fallback abaixo */}
+      if (types.isEmpty) {
+        // Fallback local: nunca deixar o utilizador preso sem opções.
+        types = const [
+          BusinessTypeModel(key: 'agricultor', label: 'Agricultor'),
+          BusinessTypeModel(key: 'horticultor', label: 'Horticultor'),
+          BusinessTypeModel(key: 'avicultor', label: 'Avicultor'),
+          BusinessTypeModel(key: 'cunicultor', label: 'Cunicultor'),
+          BusinessTypeModel(
+              key: 'vendedor_insumos', label: 'Fornecedor de Insumos'),
+        ];
+      }
       if (mounted) setState(() => _types = types);
     });
   }

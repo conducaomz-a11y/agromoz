@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../providers/articles_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/base_view_state.dart';
 import '../../../providers/home_provider.dart';
@@ -12,6 +13,7 @@ import '../../widgets/product_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/shimmer_box.dart';
 import '../../widgets/state_views.dart';
+import '../articles/article_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,14 +26,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<HomeProvider>().load(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeProvider>().load();
+      final articles = context.read<ArticlesProvider>();
+      if (articles.status == ViewStatus.initial) articles.load();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final home = context.watch<HomeProvider>();
+    final articles = context.watch<ArticlesProvider>().articles;
     final user = context.watch<AuthProvider>().user;
     final unread = context.watch<NotificationProvider>().unreadCount;
     final theme = Theme.of(context);
@@ -97,17 +102,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                 ),
-                if (home.categories.isNotEmpty) ...[
+                if (home.categories.any((c) => c.productCount > 0)) ...[
                   const SectionHeader(title: 'Categorias'),
                   SizedBox(
                     height: 100,
-                    child: ListView.separated(
+                    child: Builder(builder: (context) {
+                      // Long page de venda: só categorias COM produtos.
+                      final cats = home.categories
+                          .where((c) => c.productCount > 0)
+                          .toList();
+                      return ListView.separated(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: home.categories.length,
+                      itemCount: cats.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 12),
                       itemBuilder: (_, i) {
-                        final c = home.categories[i];
+                        final c = cats[i];
                         return _CategoryBubble(
                           name: c.name,
                           iconUrl: c.iconUrl,
@@ -118,7 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                    ),
+                    );
+                    }),
                   ),
                 ],
                 if (home.featured.isNotEmpty) ...[
@@ -128,6 +139,90 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.pushNamed(context, AppRouter.marketplace),
                   ),
                   _HorizontalProducts(products: home.featured),
+                ],
+                if (articles.isNotEmpty) ...[
+                  const SectionHeader(title: 'Notícias e dicas'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        for (final a in articles.take(4))
+                          Card(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      ArticleDetailScreen(slugOrId: a.slug),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: SizedBox(
+                                        width: 84,
+                                        height: 70,
+                                        child: a.imageUrl != null
+                                            ? AppNetworkImage(url: a.imageUrl)
+                                            : Container(
+                                                color: theme.colorScheme
+                                                    .primaryContainer,
+                                                child: Icon(Icons.article_outlined,
+                                                    color: theme
+                                                        .colorScheme.primary),
+                                              ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (a.categoryName != null)
+                                            Text(
+                                              a.categoryName!.toUpperCase(),
+                                              style: theme
+                                                  .textTheme.labelSmall
+                                                  ?.copyWith(
+                                                color: theme
+                                                    .colorScheme.primary,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          Text(
+                                            a.title,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text('Ler na app',
+                                              style: theme
+                                                  .textTheme.labelSmall
+                                                  ?.copyWith(
+                                                      color: theme.colorScheme
+                                                          .onSurfaceVariant)),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(Icons.chevron_right_rounded),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
                 if (home.latest.isNotEmpty) ...[
                   SectionHeader(
@@ -161,6 +256,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
+                // ── CTA: convite a vender na AgroMoz ──
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: Card(
+                    color: theme.colorScheme.primaryContainer,
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('🌱 Tens produtos para vender?',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: theme
+                                      .colorScheme.onPrimaryContainer)),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Cria a tua página de negócio grátis e chega a '
+                            'compradores em todo Moçambique.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                                color:
+                                    theme.colorScheme.onPrimaryContainer),
+                          ),
+                          const SizedBox(height: 12),
+                          FilledButton.icon(
+                            onPressed: () => Navigator.pushNamed(
+                                context, AppRouter.businessDashboard),
+                            icon: const Icon(Icons.storefront_rounded),
+                            label: const Text('Criar Página de Negócio'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
               ],
             ),

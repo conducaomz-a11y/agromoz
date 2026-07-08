@@ -6,8 +6,9 @@ import 'articles/articles_screen.dart';
 import 'home/home_screen.dart';
 import 'marketplace/marketplace_screen.dart';
 import 'profile/profile_screen.dart';
+import 'suppliers/suppliers_screen.dart';
 
-/// Navegação principal: Início · Marketplace · Aprender · Perfil.
+/// Navegação principal: Início · Marketplace · Fornecedores · Aprender · Perfil.
 /// (Sem aba de pesquisa nem de mensagens — o contacto com vendedores
 /// é feito directamente pelo WhatsApp.)
 class MainShell extends StatefulWidget {
@@ -23,6 +24,7 @@ class _MainShellState extends State<MainShell> {
   static const _screens = [
     HomeScreen(),
     MarketplaceScreen(),
+    SuppliersScreen(),
     ArticlesScreen(),
     ProfileScreen(),
   ];
@@ -52,6 +54,11 @@ class _MainShellState extends State<MainShell> {
             icon: Icon(Icons.storefront_outlined),
             selectedIcon: Icon(Icons.storefront_rounded),
             label: 'Marketplace',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.groups_outlined),
+            selectedIcon: Icon(Icons.groups_rounded),
+            label: 'Fornecedores',
           ),
           NavigationDestination(
             icon: Icon(Icons.menu_book_outlined),

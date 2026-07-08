@@ -6,6 +6,7 @@ import '../presentation/screens/auth/login_screen.dart';
 import '../presentation/screens/auth/otp_screen.dart';
 import '../presentation/screens/auth/register_screen.dart';
 import '../presentation/screens/business/business_dashboard_screen.dart';
+import '../presentation/screens/business/business_edit_screen.dart';
 import '../presentation/screens/business/business_wizard_screen.dart';
 import '../presentation/screens/business/my_products_screen.dart';
 import '../presentation/screens/farmer/farmer_profile_screen.dart';
@@ -42,6 +43,7 @@ class AppRouter {
   static const String settings = '/profile/settings';
   static const String businessDashboard = '/business';
   static const String businessWizard = '/business/create';
+  static const String businessEdit = '/business/edit';
   static const String myProducts = '/business/products';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -93,6 +95,8 @@ class AppRouter {
         return _page(const BusinessDashboardScreen(), settings);
       case businessWizard:
         return _page(const BusinessWizardScreen(), settings);
+      case businessEdit:
+        return _page(const BusinessEditScreen(), settings);
       case myProducts:
         return _page(const MyProductsScreen(), settings);
       case AppRouter.settings:

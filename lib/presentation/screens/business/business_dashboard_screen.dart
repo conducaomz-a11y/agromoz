@@ -6,6 +6,7 @@ import '../../../providers/base_view_state.dart';
 import '../../../providers/business_provider.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/state_views.dart';
+import 'business_edit_screen.dart';
 import 'business_wizard_screen.dart';
 import 'my_products_screen.dart';
 import 'product_form_screen.dart';

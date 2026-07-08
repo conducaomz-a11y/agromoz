@@ -50,6 +50,7 @@ class ApiEndpoints {
   static String businessProductAvailability(String id) =>
       '/business/products/$id/availability';
   static String farmerReviewCreate(String id) => '/farmers/$id/reviews';
+  static const String farmers = '/farmers';
 
   // ── Misc ──────────────────────────────────────────────
   static const String notifications = '/notifications';
