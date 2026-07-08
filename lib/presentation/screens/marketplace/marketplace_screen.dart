@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../data/repositories/product_repository.dart';
 import '../../../providers/base_view_state.dart';
+import '../../../data/repositories/product_repository.dart';
 import '../../../providers/marketplace_provider.dart';
 import '../../../routes/app_router.dart';
 import '../../widgets/product_card.dart';
@@ -21,6 +21,7 @@ class MarketplaceScreen extends StatefulWidget {
 
 class _MarketplaceScreenState extends State<MarketplaceScreen> {
   final _scroll = ScrollController();
+  final _searchCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -50,7 +51,24 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   void dispose() {
     _scroll.removeListener(_onScroll);
     _scroll.dispose();
+    _searchCtrl.dispose();
     super.dispose();
+  }
+
+  void _submitSearch(String text) {
+    final provider = context.read<MarketplaceProvider>();
+    final f = provider.filters;
+    // copyWith usa `??`, por isso não consegue LIMPAR a query — construímos à mão.
+    provider.applyFilters(ProductFilters(
+      query: text.trim().isEmpty ? null : text.trim(),
+      categoryId: f.categoryId,
+      province: f.province,
+      district: f.district,
+      minPrice: f.minPrice,
+      maxPrice: f.maxPrice,
+      condition: f.condition,
+      sort: f.sort,
+    ));
   }
 
   Future<void> _openFilters() async {
@@ -73,13 +91,37 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mercado'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: SearchBar(
+              controller: _searchCtrl,
+              hintText: 'Pesquisar produtos…',
+              leading: const Icon(Icons.search_rounded),
+              elevation: const WidgetStatePropertyAll(0),
+              onSubmitted: _submitSearch,
+              trailing: [
+                if (_searchCtrl.text.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () {
+                      _searchCtrl.clear();
+                      _submitSearch('');
+                      setState(() {});
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: provider.isGridView ? 'Ver em lista' : 'Ver em grelha',
             onPressed: provider.toggleLayout,
             icon: Icon(provider.isGridView
                 ? Icons.view_list_rounded
-                : Icons.grid_view_rounded,),
+                : Icons.grid_view_rounded),
           ),
           IconButton(
             onPressed: _openFilters,
@@ -129,7 +171,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   itemBuilder: (_, i) {
                     if (i >= provider.products.length) {
                       return const ShimmerBox(
-                          height: double.infinity, radius: 16,);
+                          height: double.infinity, radius: 16);
                     }
                     final p = provider.products[i];
                     return ProductCard(

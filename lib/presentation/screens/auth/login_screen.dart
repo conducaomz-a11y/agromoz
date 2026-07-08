@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/utils/validators.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../routes/app_router.dart';
+import 'verify_email_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,6 +34,19 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
     if (ok) {
       Navigator.pushNamedAndRemoveUntil(context, AppRouter.main, (_) => false);
+    } else if (auth.needsVerificationIdentifier != null) {
+      // Conta por confirmar — a API já reenviou o código para o e-mail.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(auth.error ?? 'Confirma o teu e-mail.')),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VerifyEmailScreen(
+            identifier: auth.needsVerificationIdentifier!,
+          ),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(auth.error ?? 'Falha ao iniciar sessão.')),
@@ -57,17 +71,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Icon(Icons.agriculture_rounded,
-                        size: 56, color: theme.colorScheme.primary,),
+                        size: 56, color: theme.colorScheme.primary),
                     const SizedBox(height: 12),
                     Text('Bem-vindo de volta',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w800),),
+                            ?.copyWith(fontWeight: FontWeight.w800)),
                     const SizedBox(height: 6),
                     Text('Inicie sessão para continuar no AgroMoz',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,),),
+                            color: theme.colorScheme.onSurfaceVariant)),
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _identifier,
@@ -92,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         suffixIcon: IconButton(
                           icon: Icon(_obscure
                               ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,),
+                              : Icons.visibility_off_outlined),
                           onPressed: () =>
                               setState(() => _obscure = !_obscure),
                         ),
@@ -103,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () => Navigator.pushNamed(
-                            context, AppRouter.forgotPassword,),
+                            context, AppRouter.forgotPassword),
                         child: const Text('Esqueceu a palavra-passe?'),
                       ),
                     ),
@@ -124,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('Ainda não tem conta?',
-                            style: theme.textTheme.bodyMedium,),
+                            style: theme.textTheme.bodyMedium),
                         TextButton(
                           onPressed: () =>
                               Navigator.pushNamed(context, AppRouter.register),

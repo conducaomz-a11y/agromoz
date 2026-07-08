@@ -1,38 +1,61 @@
-/// Artigo do blog do site AgroMoz (endpoint GET /articles).
-///
-/// Ao tocar num artigo, a app abre [url] no navegador — a leitura
-/// acontece no próprio site, gerando visitas e receita de anúncios.
+/// Artigo educativo do site AgroMoz — a app abre o conteúdo completo
+/// dentro da própria app (sem sair para o browser).
 class ArticleModel {
   const ArticleModel({
     required this.id,
     required this.title,
-    required this.url,
+    required this.slug,
     this.excerpt,
     this.imageUrl,
+    this.categoryId,
     this.categoryName,
     this.publishedAt,
-    this.views = 0,
+    this.content,
   });
 
   final String id;
   final String title;
-  final String url;
+  final String slug;
   final String? excerpt;
   final String? imageUrl;
+  final String? categoryId;
   final String? categoryName;
   final DateTime? publishedAt;
-  final int views;
+
+  /// HTML completo do artigo — só vem no detalhe.
+  final String? content;
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) => ArticleModel(
-        id: json['id']?.toString() ?? '',
+        id: json['id'].toString(),
         title: json['title'] as String? ?? '',
-        url: json['url'] as String? ?? '',
+        slug: json['slug'] as String? ?? '',
         excerpt: json['excerpt'] as String?,
         imageUrl: json['image_url'] as String?,
+        categoryId: json['category_id']?.toString(),
         categoryName: json['category_name'] as String?,
         publishedAt: json['published_at'] != null
             ? DateTime.tryParse(json['published_at'].toString())
             : null,
-        views: (json['views'] as num?)?.toInt() ?? 0,
+        content: json['content'] as String?,
+      );
+}
+
+/// Categoria de artigos (com contagem).
+class ArticleCategoryModel {
+  const ArticleCategoryModel({
+    required this.id,
+    required this.name,
+    this.articleCount = 0,
+  });
+
+  final String id;
+  final String name;
+  final int articleCount;
+
+  factory ArticleCategoryModel.fromJson(Map<String, dynamic> json) =>
+      ArticleCategoryModel(
+        id: json['id'].toString(),
+        name: json['name'] as String? ?? '',
+        articleCount: (json['article_count'] as num?)?.toInt() ?? 0,
       );
 }

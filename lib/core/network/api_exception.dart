@@ -2,11 +2,21 @@ import 'package:dio/dio.dart';
 
 /// Domain-level error the UI can render safely.
 class ApiException implements Exception {
-  const ApiException(this.message, {this.statusCode, this.isNetwork = false});
+  const ApiException(
+    this.message, {
+    this.statusCode,
+    this.isNetwork = false,
+    this.needsVerification = false,
+    this.verificationIdentifier,
+  });
 
   final String message;
   final int? statusCode;
   final bool isNetwork;
+
+  /// A API pediu verificação de e-mail (registo/login por confirmar).
+  final bool needsVerification;
+  final String? verificationIdentifier;
 
   bool get isUnauthorized => statusCode == 401;
 
@@ -30,7 +40,14 @@ class ApiException implements Exception {
         final String serverMsg = (data is Map && data['message'] is String)
             ? data['message'] as String
             : _defaultForCode(code);
-        return ApiException(serverMsg, statusCode: code);
+        return ApiException(
+          serverMsg,
+          statusCode: code,
+          needsVerification:
+              data is Map && data['needs_verification'] == true,
+          verificationIdentifier:
+              data is Map ? data['identifier'] as String? : null,
+        );
       case DioExceptionType.cancel:
         return const ApiException('Pedido cancelado.');
       default:

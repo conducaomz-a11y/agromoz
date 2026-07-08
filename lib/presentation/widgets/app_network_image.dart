@@ -27,7 +27,7 @@ class AppNetworkImage extends StatelessWidget {
       color: scheme.surfaceContainerHighest,
       alignment: Alignment.center,
       child: Icon(Icons.agriculture_outlined,
-          size: 36, color: scheme.onSurfaceVariant.withValues(alpha: .5),),
+          size: 36, color: scheme.onSurfaceVariant.withOpacity(.5)),
     );
 
     final Widget image = (url == null || url!.isEmpty)

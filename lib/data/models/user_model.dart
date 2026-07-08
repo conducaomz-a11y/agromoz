@@ -4,6 +4,7 @@ class UserModel {
     required this.name,
     this.email,
     this.phone,
+    this.whatsapp,
     this.avatarUrl,
     this.province,
     this.district,
@@ -20,6 +21,9 @@ class UserModel {
   final String name;
   final String? email;
   final String? phone;
+
+  /// Número de WhatsApp do vendedor/empresa (para o botão de contacto).
+  final String? whatsapp;
   final String? avatarUrl;
   final String? province;
   final String? district;
@@ -53,6 +57,7 @@ class UserModel {
         name: json['name'] as String? ?? '',
         email: json['email'] as String?,
         phone: json['phone'] as String?,
+        whatsapp: json['whatsapp'] as String?,
         avatarUrl: json['avatar_url'] as String?,
         province: json['province'] as String?,
         district: json['district'] as String?,

@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../providers/base_view_state.dart';
 import '../../../providers/product_detail_provider.dart';
+import '../../../core/utils/contact_launcher.dart';
 import '../../../routes/app_router.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/product_card.dart';
@@ -122,7 +123,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 Text(product.title,
                     style: theme.textTheme.headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.w800),),
+                        ?.copyWith(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
                 Text(
                   Formatters.price(product.price) +
@@ -150,7 +151,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                       label: Text(product.isAvailable
                           ? 'Disponível'
-                          : 'Indisponível',),
+                          : 'Indisponível'),
                     ),
                     if (product.locationLabel.isNotEmpty)
                       Chip(
@@ -170,13 +171,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 16),
                   Text('Descrição',
                       style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),),
+                          ?.copyWith(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 6),
                   Text(product.description!,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         height: 1.5,
                         color: theme.colorScheme.onSurfaceVariant,
-                      ),),
+                      )),
                 ],
                 // ── Seller card ─────────────────────────
                 if (product.seller != null) ...[
@@ -194,11 +195,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                       title: Text(product.seller!.name,
                           style:
-                              const TextStyle(fontWeight: FontWeight.w700),),
+                              const TextStyle(fontWeight: FontWeight.w700)),
                       subtitle: Row(
                         children: [
                           RatingStars(
-                              rating: product.seller!.rating, size: 14,),
+                              rating: product.seller!.rating, size: 14),
                           const SizedBox(width: 6),
                           Text('(${product.seller!.reviewCount})'),
                         ],
@@ -258,19 +259,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       const SizedBox(width: 12),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: () {
-                          // The API creates/returns a conversation with the seller.
-                          Navigator.pushNamed(
-                            context,
-                            AppRouter.chat,
-                            arguments: ChatArgs(
-                              conversationId: 'seller_${product.seller!.id}',
-                              otherUser: product.seller!,
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.chat_bubble_outline_rounded),
-                        label: const Text('Mensagem'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF25D366),
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => ContactLauncher.openWhatsApp(
+                          context,
+                          phone: product.seller!.whatsapp ??
+                              product.seller!.phone ??
+                              '',
+                          message: 'Olá! Vi o produto "${product.title}" '
+                              'no AgroMoz e gostaria de saber mais.',
+                        ),
+                        icon: const Icon(Icons.chat_rounded),
+                        label: const Text('WhatsApp'),
                       ),
                     ),
                   ],

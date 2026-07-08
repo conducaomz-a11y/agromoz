@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
                 const ListTile(
                   leading: Icon(Icons.palette_outlined),
                   title: Text('Tema da aplicação',
-                      style: TextStyle(fontWeight: FontWeight.w700),),
+                      style: TextStyle(fontWeight: FontWeight.w700)),
                 ),
                 RadioListTile<ThemeMode>(
                   value: ThemeMode.system,

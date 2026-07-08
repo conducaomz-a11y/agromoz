@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/chat_provider.dart';
 import '../../providers/notification_provider.dart';
+import 'articles/articles_screen.dart';
 import 'home/home_screen.dart';
-import 'fornecedores/fornecedores_screen.dart';
-import 'messages/conversations_screen.dart';
+import 'marketplace/marketplace_screen.dart';
 import 'profile/profile_screen.dart';
-import 'search/search_screen.dart';
 
-/// Bottom navigation shell: Início · Fornecedores · Pesquisar · Mensagens · Perfil.
+/// Navegação principal: Início · Marketplace · Aprender · Perfil.
+/// (Sem aba de pesquisa nem de mensagens — o contacto com vendedores
+/// é feito directamente pelo WhatsApp.)
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -22,9 +22,8 @@ class _MainShellState extends State<MainShell> {
 
   static const _screens = [
     HomeScreen(),
-    FornecedoresScreen(),
-    SearchScreen(),
-    ConversationsScreen(),
+    MarketplaceScreen(),
+    ArticlesScreen(),
     ProfileScreen(),
   ];
 
@@ -33,47 +32,33 @@ class _MainShellState extends State<MainShell> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NotificationProvider>().load();
-      context.read<ChatProvider>().loadConversations();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final unreadChats = context.select<ChatProvider, int>(
-      (p) => p.conversations.fold(0, (sum, c) => sum + c.unreadCount),
-    );
-
     return Scaffold(
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: [
-          const NavigationDestination(
+        destinations: const [
+          NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home_rounded),
             label: 'Início',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.storefront_outlined),
             selectedIcon: Icon(Icons.storefront_rounded),
-            label: 'Fornecedores',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.search_rounded),
-            selectedIcon: Icon(Icons.saved_search_rounded),
-            label: 'Pesquisar',
+            label: 'Marketplace',
           ),
           NavigationDestination(
-            icon: Badge(
-              isLabelVisible: unreadChats > 0,
-              label: Text('$unreadChats'),
-              child: const Icon(Icons.chat_bubble_outline_rounded),
-            ),
-            selectedIcon: const Icon(Icons.chat_bubble_rounded),
-            label: 'Mensagens',
+            icon: Icon(Icons.menu_book_outlined),
+            selectedIcon: Icon(Icons.menu_book_rounded),
+            label: 'Aprender',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.person_outline_rounded),
             selectedIcon: Icon(Icons.person_rounded),
             label: 'Perfil',

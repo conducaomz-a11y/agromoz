@@ -64,7 +64,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       SnackBar(
         content: Text(ok
             ? 'Perfil actualizado com sucesso.'
-            : auth.error ?? 'Falha ao actualizar o perfil.',),
+            : auth.error ?? 'Falha ao actualizar o perfil.'),
       ),
     );
     if (ok) Navigator.pop(context);
@@ -137,7 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  initialValue: _province,
+                  value: _province,
                   decoration: const InputDecoration(labelText: 'Província'),
                   items: AppConstants.provinces
                       .map((p) => DropdownMenuItem(value: p, child: Text(p)))

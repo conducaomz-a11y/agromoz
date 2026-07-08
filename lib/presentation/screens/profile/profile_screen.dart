@@ -30,7 +30,7 @@ class ProfileScreen extends StatelessWidget {
       await context.read<AuthProvider>().logout();
       if (context.mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, AppRouter.login, (_) => false,);
+            context, AppRouter.login, (_) => false);
       }
     }
   }
@@ -65,26 +65,26 @@ class ProfileScreen extends StatelessWidget {
                             children: [
                               Text(user.name,
                                   style: theme.textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.w800,),),
+                                      fontWeight: FontWeight.w800)),
                               const SizedBox(height: 2),
                               Text(user.roleLabel,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.primary,
                                     fontWeight: FontWeight.w600,
-                                  ),),
+                                  )),
                               if (user.email != null)
                                 Text(user.email!,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color:
                                           theme.colorScheme.onSurfaceVariant,
-                                    ),),
+                                    )),
                             ],
                           ),
                         ),
                         IconButton(
                           tooltip: 'Editar perfil',
                           onPressed: () => Navigator.pushNamed(
-                              context, AppRouter.editProfile,),
+                              context, AppRouter.editProfile),
                           icon: const Icon(Icons.edit_outlined),
                         ),
                       ],
@@ -101,10 +101,10 @@ class ProfileScreen extends StatelessWidget {
                         Navigator.pushNamed(context, AppRouter.favorites),
                   ),
                   _MenuItem(
-                    icon: Icons.inventory_2_outlined,
-                    label: 'Meus anúncios',
-                    onTap: () =>
-                        Navigator.pushNamed(context, AppRouter.myListings),
+                    icon: Icons.storefront_outlined,
+                    label: 'Meu Negócio',
+                    onTap: () => Navigator.pushNamed(
+                        context, AppRouter.businessDashboard),
                   ),
                   _MenuItem(
                     icon: Icons.notifications_outlined,
@@ -112,14 +112,14 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.notifications),
                   ),
-                ],),
+                ]),
                 const SizedBox(height: 16),
                 _MenuCard(items: [
                   _MenuItem(
                     icon: Icons.lock_outline_rounded,
                     label: 'Mudar palavra-passe',
                     onTap: () => Navigator.pushNamed(
-                        context, AppRouter.changePassword,),
+                        context, AppRouter.changePassword),
                   ),
                   _MenuItem(
                     icon: Icons.settings_outlined,
@@ -127,7 +127,7 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.settings),
                   ),
-                ],),
+                ]),
                 const SizedBox(height: 16),
                 Card(
                   child: ListTile(
@@ -137,7 +137,7 @@ class ProfileScreen extends StatelessWidget {
                         style: TextStyle(
                           color: theme.colorScheme.error,
                           fontWeight: FontWeight.w700,
-                        ),),
+                        )),
                     onTap: () => _confirmLogout(context),
                   ),
                 ),
@@ -146,7 +146,7 @@ class ProfileScreen extends StatelessWidget {
                   child: Text('AgroMoz v1.0.0',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
-                      ),),
+                      )),
                 ),
               ],
             ),
@@ -174,7 +174,7 @@ class _MenuCard extends StatelessWidget {
             ListTile(
               leading: Icon(items[i].icon),
               title: Text(items[i].label,
-                  style: const TextStyle(fontWeight: FontWeight.w600),),
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: items[i].onTap,
             ),

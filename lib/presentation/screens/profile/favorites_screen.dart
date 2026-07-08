@@ -62,7 +62,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(Icons.delete_outline_rounded,
-                        color: Theme.of(context).colorScheme.error,),
+                        color: Theme.of(context).colorScheme.error),
                   ),
                   child: ProductListTile(
                     product: p,

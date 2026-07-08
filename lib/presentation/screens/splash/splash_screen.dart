@@ -64,11 +64,11 @@ class _SplashScreenState extends State<SplashScreen>
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .12),
+                    color: Colors.white.withOpacity(.12),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.agriculture_rounded,
-                      size: 64, color: Colors.white,),
+                      size: 64, color: Colors.white),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 6),
                 Text(
                   'O mercado agrícola de Moçambique',
-                  style: TextStyle(color: Colors.white.withValues(alpha: .85)),
+                  style: TextStyle(color: Colors.white.withOpacity(.85)),
                 ),
               ],
             ),

@@ -35,13 +35,13 @@ class EmptyStateView extends StatelessWidget {
             Text(title,
                 style: theme.textTheme.titleLarge
                     ?.copyWith(fontWeight: FontWeight.w700),
-                textAlign: TextAlign.center,),
+                textAlign: TextAlign.center),
             if (message != null) ...[
               const SizedBox(height: 8),
               Text(message!,
                   style: theme.textTheme.bodyMedium
                       ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  textAlign: TextAlign.center,),
+                  textAlign: TextAlign.center),
             ],
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 24),

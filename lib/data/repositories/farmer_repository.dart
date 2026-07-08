@@ -1,7 +1,7 @@
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
-import '../models/farmer_details.dart';
 import '../models/review_model.dart';
+import '../models/user_model.dart';
 import '../models/product_model.dart';
 
 class FarmerRepository {
@@ -9,13 +9,10 @@ class FarmerRepository {
       : _client = client ?? ApiClient.instance;
   final ApiClient _client;
 
-  /// Perfil completo do Fornecedor — inclui capa, contactos e galeria.
-  Future<FarmerDetails> fetchFarmer(String id) async {
+  Future<UserModel> fetchFarmer(String id) async {
     final data = await _client
         .get<Map<String, dynamic>>(ApiEndpoints.farmerProfile(id));
-    return FarmerDetails.fromJson(
-      (data['data'] ?? data) as Map<String, dynamic>,
-    );
+    return UserModel.fromJson((data['data'] ?? data) as Map<String, dynamic>);
   }
 
   Future<List<ProductModel>> fetchFarmerProducts(String id) async {
@@ -28,6 +25,17 @@ class FarmerRepository {
         .map(ProductModel.fromJson)
         .toList();
   }
+
+  /// Envia (ou actualiza) a avaliação do utilizador para esta empresa.
+  Future<void> postReview({
+    required String farmerId,
+    required int rating,
+    String? comment,
+  }) =>
+      _client.post<void>(
+        ApiEndpoints.farmerReviewCreate(farmerId),
+        data: {'rating': rating, 'comment': comment},
+      );
 
   Future<List<ReviewModel>> fetchReviews(String id) async {
     final data = await _client

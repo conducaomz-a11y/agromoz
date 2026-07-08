@@ -36,9 +36,9 @@ class _FiltersSheetState extends State<FiltersSheet> {
     _condition = widget.current.condition;
     _district = TextEditingController(text: widget.current.district ?? '');
     _minPrice = TextEditingController(
-        text: widget.current.minPrice?.toStringAsFixed(0) ?? '',);
+        text: widget.current.minPrice?.toStringAsFixed(0) ?? '');
     _maxPrice = TextEditingController(
-        text: widget.current.maxPrice?.toStringAsFixed(0) ?? '',);
+        text: widget.current.maxPrice?.toStringAsFixed(0) ?? '');
   }
 
   @override
@@ -84,7 +84,7 @@ class _FiltersSheetState extends State<FiltersSheet> {
                 Expanded(
                   child: Text('Filtros',
                       style: theme.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w800),),
+                          ?.copyWith(fontWeight: FontWeight.w800)),
                 ),
                 TextButton(
                   onPressed: () =>
@@ -95,7 +95,7 @@ class _FiltersSheetState extends State<FiltersSheet> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              initialValue: _province,
+              value: _province,
               decoration: const InputDecoration(labelText: 'Província'),
               items: AppConstants.provinces
                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))
@@ -109,11 +109,11 @@ class _FiltersSheetState extends State<FiltersSheet> {
             ),
             const SizedBox(height: 14),
             DropdownButtonFormField<String>(
-              initialValue: _categoryId,
+              value: _categoryId,
               decoration: const InputDecoration(labelText: 'Categoria'),
               items: widget.categories
                   .map((c) =>
-                      DropdownMenuItem(value: c.id, child: Text(c.name)),)
+                      DropdownMenuItem(value: c.id, child: Text(c.name)))
                   .toList(),
               onChanged: (v) => setState(() => _categoryId = v),
             ),

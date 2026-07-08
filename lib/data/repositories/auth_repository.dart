@@ -19,13 +19,15 @@ class AuthRepository {
     return UserModel.fromJson(data['user'] as Map<String, dynamic>);
   }
 
-  Future<UserModel> register({
+  /// Regista a conta. A conta fica POR VERIFICAR — a API envia um código
+  /// de 6 dígitos para o e-mail (mesmo mecanismo do site).
+  Future<RegisterResult> register({
     required String name,
     required String email,
     required String phone,
     required String password,
-    required String role,
     String? province,
+    bool wantsBusiness = false,
   }) async {
     final data = await _client.post<Map<String, dynamic>>(
       ApiEndpoints.register,
@@ -34,13 +36,34 @@ class AuthRepository {
         'email': email,
         'phone': phone,
         'password': password,
-        'role': role,
         'province': province,
+        'wants_business': wantsBusiness,
       },
+    );
+    return RegisterResult(
+      message: data['message'] as String? ?? '',
+      identifier: data['identifier'] as String? ?? email,
+      debugCode: data['debug_code'] as String?,
+    );
+  }
+
+  /// Confirma o código de verificação e ENTRA (a API devolve tokens + user).
+  Future<UserModel> verifyEmail({
+    required String identifier,
+    required String code,
+  }) async {
+    final data = await _client.post<Map<String, dynamic>>(
+      ApiEndpoints.verifyEmail,
+      data: {'identifier': identifier, 'code': code},
     );
     await _persistTokens(data);
     return UserModel.fromJson(data['user'] as Map<String, dynamic>);
   }
+
+  Future<void> resendCode(String identifier) => _client.post<void>(
+        ApiEndpoints.resendCode,
+        data: {'identifier': identifier},
+      );
 
   Future<void> forgotPassword(String identifier) => _client.post<void>(
         ApiEndpoints.forgotPassword,
@@ -94,4 +117,19 @@ class AuthRepository {
         accessToken: data['access_token'] as String? ?? '',
         refreshToken: data['refresh_token'] as String?,
       );
+}
+
+/// Resultado do registo — a conta fica pendente de verificação por e-mail.
+class RegisterResult {
+  const RegisterResult({
+    required this.message,
+    required this.identifier,
+    this.debugCode,
+  });
+
+  final String message;
+  final String identifier;
+
+  /// Só em modo de teste da API (DEBUG_OTP) — nunca em produção.
+  final String? debugCode;
 }
