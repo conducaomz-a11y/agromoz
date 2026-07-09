@@ -52,6 +52,9 @@ class SuppliersProvider extends ChangeNotifier {
     } on ApiException catch (e) {
       error = e.message;
       status = ViewStatus.error;
+    } catch (_) {
+      error = 'Não foi possível carregar os fornecedores. Tenta novamente.';
+      status = ViewStatus.error;
     }
     notifyListeners();
   }

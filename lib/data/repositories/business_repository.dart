@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
+import '../../core/network/api_exception.dart';
 import '../models/business_model.dart';
 import '../models/category_model.dart';
 
@@ -121,7 +122,9 @@ class BusinessRepository {
       : _client = client ?? ApiClient.instance;
   final ApiClient _client;
 
-  /// A minha empresa — null se ainda não criei (API devolve 404).
+  /// A minha empresa — null apenas se ainda não a criei (API devolve 404).
+  /// Outros erros (rede, 401, 500, resposta inesperada) são propagados para
+  /// que a UI mostre um estado de erro em vez de assumir "sem negócio".
   Future<BusinessModel?> fetchMyBusiness() async {
     try {
       final data =
@@ -129,8 +132,9 @@ class BusinessRepository {
       return BusinessModel.fromJson(
         (data['data'] ?? data) as Map<String, dynamic>,
       );
-    } catch (_) {
-      return null;
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) return null;
+      rethrow;
     }
   }
 
