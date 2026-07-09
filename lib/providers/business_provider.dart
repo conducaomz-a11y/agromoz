@@ -39,6 +39,9 @@ class BusinessProvider extends ChangeNotifier {
     } on ApiException catch (e) {
       error = e.message;
       status = ViewStatus.error;
+    } catch (_) {
+      error = 'Não foi possível carregar o teu negócio. Tenta novamente.';
+      status = ViewStatus.error;
     }
     notifyListeners();
   }
