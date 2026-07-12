@@ -28,7 +28,18 @@ dependencies:
 
   # Media & device
   image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
   geolocator: ^12.0.0
+
+  # Offline cache (Hive)
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.3
+
+  # Notifications (local + push)
+  flutter_local_notifications: ^17.2.2
+  firebase_core: ^3.3.0
+  firebase_messaging: ^15.0.4
 
   # HTML rendering (artigos dentro da app)
   flutter_html: ^3.0.0-beta.2
@@ -39,10 +50,23 @@ dependencies:
   share_plus: ^9.0.0
   url_launcher: ^6.2.6
 
+  # Anúncios (AdMob) — ATIVO
+  google_mobile_ads: ^5.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/logo.png"
+  background_color_ios: "#2E7D32"
+  adaptive_icon_background: "#2E7D32"
+  adaptive_icon_foreground: "assets/images/logo.png"
+  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true
