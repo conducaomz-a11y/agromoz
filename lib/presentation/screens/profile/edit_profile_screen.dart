@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/image_picker_service.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/models/user_model.dart';
 import '../../../providers/auth_provider.dart';
@@ -22,6 +23,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController _district;
   late final TextEditingController _bio;
   String? _province;
+  String? _localAvatar;
+  bool _uploadingAvatar = false;
 
   @override
   void initState() {
@@ -41,6 +44,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _changeAvatar() async {
+    final path = await ImagePickerService.instance.pickAndCompress(context);
+    if (path == null || !mounted) return;
+    setState(() {
+      _localAvatar = path;
+      _uploadingAvatar = true;
+    });
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.uploadAvatar(path);
+    if (!mounted) return;
+    setState(() => _uploadingAvatar = false);
+    if (!ok) {
+      setState(() => _localAvatar = null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(auth.error ?? 'Falha ao actualizar a foto.')),
+      );
+    }
   }
 
   Future<void> _save() async {
@@ -87,29 +109,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Center(
                   child: Stack(
                     children: [
-                      UserAvatar(
-                        name: user?.name ?? '',
-                        imageUrl: user?.avatarUrl,
-                        radius: 48,
-                      ),
+                      _localAvatar != null
+                          ? CircleAvatar(
+                              radius: 48,
+                              backgroundImage: FileImage(
+                                  ImagePickerService.fileFor(_localAvatar!)),
+                            )
+                          : UserAvatar(
+                              name: user?.name ?? '',
+                              imageUrl: user?.avatarUrl,
+                              radius: 48,
+                            ),
                       Positioned(
                         right: 0,
                         bottom: 0,
                         child: IconButton.filled(
                           iconSize: 18,
                           tooltip: 'Alterar foto',
-                          onPressed: () {
-                            // Hook ready: plug image_picker + multipart upload
-                            // to PUT /profile here.
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Ligue o image_picker ao upload de avatar.',
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.camera_alt_outlined),
+                          onPressed: _uploadingAvatar ? null : _changeAvatar,
+                          icon: _uploadingAvatar
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white),
+                                )
+                              : const Icon(Icons.camera_alt_outlined),
                         ),
                       ),
                     ],

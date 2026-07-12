@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../providers/base_view_state.dart';
 import '../../../providers/suppliers_provider.dart';
 import '../../../routes/app_router.dart';
+import '../../widgets/ad_banner.dart';
 import '../../widgets/rating_stars.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/user_avatar.dart';
@@ -54,6 +55,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
       appBar: AppBar(title: const Text('Fornecedores')),
       body: Column(
         children: [
+          const AdBanner(),
           // ── Pesquisa ──
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),

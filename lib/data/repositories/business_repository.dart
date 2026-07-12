@@ -87,6 +87,10 @@ class ProductInput {
     this.availability = 'disponivel',
     this.featured = false,
     this.imagePath,
+    this.tipoCiclo = 'nenhum',
+    this.estadoCiclo,
+    this.dataDisponivel,
+    this.quantidade,
   });
 
   final String name;
@@ -97,6 +101,10 @@ class ProductInput {
   final String availability;
   final bool featured;
   final String? imagePath;
+  final String tipoCiclo;
+  final String? estadoCiclo;
+  final String? dataDisponivel;
+  final int? quantidade;
 
   Future<FormData> toFormData() async {
     final form = FormData.fromMap({
@@ -107,6 +115,10 @@ class ProductInput {
       if (unit != null) 'unit': unit,
       'availability': availability,
       'featured': featured ? '1' : '',
+      'tipo_ciclo': tipoCiclo,
+      if (estadoCiclo != null) 'estado_ciclo': estadoCiclo,
+      if (dataDisponivel != null) 'data_disponivel': dataDisponivel,
+      if (quantidade != null) 'quantidade': quantidade.toString(),
     });
     if (imagePath != null) {
       form.files
@@ -191,6 +203,23 @@ class BusinessRepository {
       data: await input.toFormData(),
     );
     return OwnProductModel.fromJson(data['data'] as Map<String, dynamic>);
+  }
+
+  /// Gera uma descrição de produto por IA (o servidor chama o Claude).
+  Future<String> generateDescription({
+    required String name,
+    String? category,
+    String? province,
+  }) async {
+    final data = await _client.post<Map<String, dynamic>>(
+      ApiEndpoints.businessGenerateDescription,
+      data: {
+        'name': name,
+        if (category != null) 'category': category,
+        if (province != null) 'province': province,
+      },
+    );
+    return (data['data']?['description'] as String? ?? '').trim();
   }
 
   Future<OwnProductModel> updateProduct(String id, ProductInput input) async {

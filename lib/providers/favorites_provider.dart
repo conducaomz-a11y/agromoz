@@ -15,6 +15,14 @@ class FavoritesProvider extends ChangeNotifier {
   String? error;
   List<ProductModel> favorites = [];
 
+  /// Limpa os dados ao trocar de conta.
+  void reset() {
+    favorites = [];
+    status = ViewStatus.initial;
+    error = null;
+    notifyListeners();
+  }
+
   Future<void> load() async {
     status = ViewStatus.loading;
     notifyListeners();

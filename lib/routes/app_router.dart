@@ -65,7 +65,11 @@ class AppRouter {
         return _page(const MainShell(), settings);
       case marketplace:
         return _page(
-          MarketplaceScreen(initialCategoryId: args as String?),
+          MarketplaceScreen(
+            initialCategoryId:
+                args is MarketplaceArgs ? args.categoryId : args as String?,
+            initialQuery: args is MarketplaceArgs ? args.query : null,
+          ),
           settings,
         );
       case productDetail:
@@ -114,4 +118,12 @@ class AppRouter {
     RouteSettings settings,
   ) =>
       MaterialPageRoute(builder: (_) => child, settings: settings);
+}
+
+/// Arguments for the Marketplace route — lets the home pass either a category
+/// or a search query without ambiguity.
+class MarketplaceArgs {
+  const MarketplaceArgs({this.categoryId, this.query});
+  final String? categoryId;
+  final String? query;
 }

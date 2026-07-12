@@ -1,7 +1,4 @@
 /// Central registry of every REST endpoint the app consumes.
-///
-/// Replace [baseUrl] with the real AgroMoz API host. All paths below are
-/// paths match the appapi (PHP) backend deployed at agromoz.com.
 class ApiEndpoints {
   ApiEndpoints._();
 
@@ -28,6 +25,7 @@ class ApiEndpoints {
 
   // ── Users / Farmers ───────────────────────────────────
   static const String profile = '/profile';
+  static const String profileAvatar = '/profile/avatar';
   static const String changePassword = '/profile/password';
   static const String myListings = '/profile/listings';
   static const String favorites = '/favorites';
@@ -35,24 +33,29 @@ class ApiEndpoints {
   static String farmerProfile(String id) => '/farmers/$id';
   static String farmerReviews(String id) => '/farmers/$id/reviews';
 
-  // ── Articles (abrem dentro da app) ────────────────────
+  // ── Articles ──────────────────────────────────────────
   static const String articles = '/articles';
   static const String articleCategories = '/articles/categories';
   static String articleDetail(String slugOrId) => '/articles/$slugOrId';
 
-  // ── Business (fluxo profissional) ─────────────────────
+  // ── Business ──────────────────────────────────────────
   static const String business = '/business';
   static const String businessUpdate = '/business/update';
   static const String businessStats = '/business/stats';
   static const String businessTypes = '/business/types';
   static const String businessProducts = '/business/products';
+  static const String businessGenerateDescription = '/business/generate-description';
   static String businessProduct(String id) => '/business/products/$id';
-  static String businessProductAvailability(String id) =>
-      '/business/products/$id/availability';
+  static String businessProductAvailability(String id) => '/business/products/$id/availability';
   static String farmerReviewCreate(String id) => '/farmers/$id/reviews';
   static const String farmers = '/farmers';
 
+  // ── Créditos ──────────────────────────────────────────
+  static const String creditBalance = '/credits/balance';
+  static const String creditPackages = '/credits/packages';
+  static const String creditPurchase = '/credits/purchase';
+
   // ── Misc ──────────────────────────────────────────────
   static const String notifications = '/notifications';
-  static const String deviceToken = '/devices'; // FCM registration
+  static const String deviceToken = '/devices';
 }

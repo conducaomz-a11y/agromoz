@@ -5,15 +5,21 @@ import '../../../providers/base_view_state.dart';
 import '../../../data/repositories/product_repository.dart';
 import '../../../providers/marketplace_provider.dart';
 import '../../../routes/app_router.dart';
+import '../../widgets/ad_banner.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/shimmer_box.dart';
 import '../../widgets/state_views.dart';
 import 'filters_sheet.dart';
 
 class MarketplaceScreen extends StatefulWidget {
-  const MarketplaceScreen({super.key, this.initialCategoryId});
+  const MarketplaceScreen({
+    super.key,
+    this.initialCategoryId,
+    this.initialQuery,
+  });
 
   final String? initialCategoryId;
+  final String? initialQuery;
 
   @override
   State<MarketplaceScreen> createState() => _MarketplaceScreenState();
@@ -29,7 +35,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     _scroll.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<MarketplaceProvider>();
-      if (widget.initialCategoryId != null) {
+      if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+        _searchCtrl.text = widget.initialQuery!;
+        provider.applyFilters(
+          provider.filters.copyWith(query: widget.initialQuery),
+        );
+      } else if (widget.initialCategoryId != null) {
         provider.applyFilters(
           provider.filters.copyWith(categoryId: widget.initialCategoryId),
         );
@@ -184,7 +195,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     );
                   },
                 )
-              : ListView.separated(
+              : Column(
+                  children: [
+                    const AdBanner(),
+                    Expanded(
+                      child: ListView.separated(
                   controller: _scroll,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
@@ -205,6 +220,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       ),
                     );
                   },
+                ),
+                    ),
+                  ],
                 ),
         },
       ),

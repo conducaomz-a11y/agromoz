@@ -20,6 +20,7 @@ class ProductModel {
     this.seller,
     this.createdAt,
     this.viewCount = 0,
+    this.cycle,
   });
 
   final String id;
@@ -42,6 +43,7 @@ class ProductModel {
   final UserModel? seller;
   final DateTime? createdAt;
   final int viewCount;
+  final ProductCycle? cycle;
 
   String? get coverImage => images.isNotEmpty ? images.first : null;
 
@@ -67,6 +69,7 @@ class ProductModel {
         seller: seller,
         createdAt: createdAt,
         viewCount: viewCount,
+        cycle: cycle,
       );
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
@@ -94,5 +97,61 @@ class ProductModel {
             ? DateTime.tryParse(json['created_at'].toString())
             : null,
         viewCount: (json['view_count'] as num?)?.toInt() ?? 0,
+        cycle: json['cycle'] is Map<String, dynamic>
+            ? ProductCycle.fromJson(json['cycle'] as Map<String, dynamic>)
+            : null,
+      );
+}
+
+
+/// Ciclo de vida do produto (colheita/reposição). Vem do campo "cycle" da API;
+/// é null quando o produto não tem ciclo.
+class ProductCycle {
+  const ProductCycle({
+    required this.type,
+    required this.state,
+    this.availableFrom,
+    this.daysRemaining,
+    required this.label,
+    this.availability,
+    this.canNotify = false,
+  });
+
+  /// "colheita" ou "reposicao".
+  final String type;
+
+  /// "crescendo", "pronto" ou "esgotado".
+  final String state;
+
+  /// Data prevista de disponibilidade (YYYY-MM-DD), ou null.
+  final DateTime? availableFrom;
+
+  /// Dias que faltam (pode ser 0/negativo), ou null.
+  final int? daysRemaining;
+
+  /// Texto pronto a mostrar, ex.: "Colheita prevista em 23 dias".
+  final String label;
+
+  /// "PreOrder", "InStock" ou "OutOfStock".
+  final String? availability;
+
+  /// Se faz sentido mostrar o sino "avisar-me".
+  final bool canNotify;
+
+  bool get isGrowing => state == 'crescendo';
+  bool get isReady => state == 'pronto';
+  bool get isSoldOut => state == 'esgotado';
+  bool get isHarvest => type == 'colheita';
+
+  factory ProductCycle.fromJson(Map<String, dynamic> json) => ProductCycle(
+        type: json['type'] as String? ?? 'colheita',
+        state: json['state'] as String? ?? 'crescendo',
+        availableFrom: json['available_from'] != null
+            ? DateTime.tryParse(json['available_from'].toString())
+            : null,
+        daysRemaining: (json['days_remaining'] as num?)?.toInt(),
+        label: json['label'] as String? ?? '',
+        availability: json['availability'] as String?,
+        canNotify: json['can_notify'] as bool? ?? false,
       );
 }

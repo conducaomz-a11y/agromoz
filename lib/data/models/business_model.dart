@@ -147,6 +147,10 @@ class OwnProductModel {
     this.isFeatured = false,
     this.status = 'ativo',
     this.views = 0,
+    this.tipoCiclo = 'nenhum',
+    this.estadoCiclo,
+    this.dataDisponivel,
+    this.quantidade,
   });
 
   final String id;
@@ -165,6 +169,18 @@ class OwnProductModel {
   final bool isFeatured;
   final String status;
   final int views;
+
+  /// Ciclo de vida (igual ao site): nenhum | colheita | reposicao
+  final String tipoCiclo;
+
+  /// crescendo | pronto | esgotado (só quando tipoCiclo != nenhum)
+  final String? estadoCiclo;
+
+  /// Data prevista (YYYY-MM-DD) de colheita/reposição.
+  final String? dataDisponivel;
+
+  /// Quantidade em stock (lojas). null = não controla.
+  final int? quantidade;
 
   String get availabilityLabel {
     switch (availability) {
@@ -193,5 +209,9 @@ class OwnProductModel {
         isFeatured: json['is_featured'] as bool? ?? false,
         status: json['status'] as String? ?? 'ativo',
         views: (json['views'] as num?)?.toInt() ?? 0,
+        tipoCiclo: json['tipo_ciclo'] as String? ?? 'nenhum',
+        estadoCiclo: json['estado_ciclo'] as String?,
+        dataDisponivel: json['data_disponivel'] as String?,
+        quantidade: (json['quantidade'] as num?)?.toInt(),
       );
 }

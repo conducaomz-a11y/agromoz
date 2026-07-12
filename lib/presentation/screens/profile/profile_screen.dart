@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/auth_provider.dart';
+import '../../../providers/business_provider.dart';
+import '../../../providers/favorites_provider.dart';
+import '../../../providers/notification_provider.dart';
 import '../../../routes/app_router.dart';
 import '../../widgets/user_avatar.dart';
 
@@ -29,8 +32,12 @@ class ProfileScreen extends StatelessWidget {
     if (ok == true && context.mounted) {
       await context.read<AuthProvider>().logout();
       if (context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-            context, AppRouter.login, (_) => false);
+        // Limpa os dados da conta anterior para não "vazarem" para a próxima.
+        context.read<BusinessProvider>().reset();
+        context.read<FavoritesProvider>().reset();
+        context.read<NotificationProvider>().reset();
+        Navigator.of(context, rootNavigator: true)
+            .pushNamedAndRemoveUntil(AppRouter.login, (_) => false);
       }
     }
   }

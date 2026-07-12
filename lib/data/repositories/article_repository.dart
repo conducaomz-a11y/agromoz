@@ -1,5 +1,7 @@
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
+import '../../core/network/api_exception.dart';
+import '../../core/storage/cache_service.dart';
 import '../models/article_model.dart';
 import '../models/paginated_response.dart';
 
@@ -25,11 +27,18 @@ class ArticleRepository {
   }
 
   Future<ArticleModel> fetchArticle(String slugOrId) async {
-    final data = await _client
-        .get<Map<String, dynamic>>(ApiEndpoints.articleDetail(slugOrId));
-    return ArticleModel.fromJson(
-      (data['data'] ?? data) as Map<String, dynamic>,
-    );
+    final cacheKey = CacheService.articleDetail(slugOrId);
+    try {
+      final data = await _client
+          .get<Map<String, dynamic>>(ApiEndpoints.articleDetail(slugOrId));
+      final map = (data['data'] ?? data) as Map<String, dynamic>;
+      await CacheService.instance.write(cacheKey, map);
+      return ArticleModel.fromJson(map);
+    } on ApiException {
+      final cached = CacheService.instance.readMap(cacheKey);
+      if (cached != null) return ArticleModel.fromJson(cached);
+      rethrow;
+    }
   }
 
   Future<List<ArticleCategoryModel>> fetchCategories() async {

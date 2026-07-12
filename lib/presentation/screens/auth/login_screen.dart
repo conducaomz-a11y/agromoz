@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/utils/validators.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/business_provider.dart';
 import '../../../routes/app_router.dart';
 import 'verify_email_screen.dart';
 
@@ -33,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final ok = await auth.login(_identifier.text.trim(), _password.text);
     if (!mounted) return;
     if (ok) {
+      context.read<BusinessProvider>().reset(); // sessão nova, dados frescos
       Navigator.pushNamedAndRemoveUntil(context, AppRouter.main, (_) => false);
     } else if (auth.needsVerificationIdentifier != null) {
       // Conta por confirmar — a API já reenviou o código para o e-mail.

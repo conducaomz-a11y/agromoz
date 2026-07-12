@@ -118,6 +118,8 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
       ),
     );
 
+    comment.dispose();
+
     if (sent == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Obrigado pela tua avaliação! ⭐')),

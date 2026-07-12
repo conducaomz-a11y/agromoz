@@ -1,6 +1,8 @@
 import '../../core/constants/api_endpoints.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/network/api_client.dart';
+import '../../core/network/api_exception.dart';
+import '../../core/storage/cache_service.dart';
 import '../models/banner_model.dart';
 import '../models/category_model.dart';
 import '../models/paginated_response.dart';
@@ -101,39 +103,48 @@ class ProductRepository {
     return PaginatedResponse.fromJson(data, ProductModel.fromJson);
   }
 
-  Future<List<ProductModel>> fetchFeatured() =>
-      _fetchList(ApiEndpoints.featuredProducts);
+  Future<List<ProductModel>> fetchFeatured() => _cachedList(
+        cacheKey: CacheService.kHomeFeatured,
+        path: ApiEndpoints.featuredProducts,
+        parse: ProductModel.fromJson,
+      );
 
-  Future<List<ProductModel>> fetchRecommended() =>
-      _fetchList(ApiEndpoints.recommendedProducts);
+  Future<List<ProductModel>> fetchRecommended() => _cachedList(
+        cacheKey: CacheService.kHomeRecommended,
+        path: ApiEndpoints.recommendedProducts,
+        parse: ProductModel.fromJson,
+      );
 
   Future<List<ProductModel>> fetchRelated(String productId) =>
       _fetchList(ApiEndpoints.relatedProducts(productId));
 
   Future<ProductModel> fetchDetail(String id) async {
-    final data = await _client
-        .get<Map<String, dynamic>>(ApiEndpoints.productDetail(id));
-    return ProductModel.fromJson(
-      (data['data'] ?? data) as Map<String, dynamic>,
-    );
+    final cacheKey = CacheService.productDetail(id);
+    try {
+      final data = await _client
+          .get<Map<String, dynamic>>(ApiEndpoints.productDetail(id));
+      final map = (data['data'] ?? data) as Map<String, dynamic>;
+      await CacheService.instance.write(cacheKey, map);
+      return ProductModel.fromJson(map);
+    } on ApiException {
+      final cached = CacheService.instance.readMap(cacheKey);
+      if (cached != null) return ProductModel.fromJson(cached);
+      rethrow;
+    }
   }
 
-  Future<List<CategoryModel>> fetchCategories() async {
-    final data =
-        await _client.get<Map<String, dynamic>>(ApiEndpoints.categories);
-    return (data['data'] as List<dynamic>? ?? [])
-        .whereType<Map<String, dynamic>>()
-        .map(CategoryModel.fromJson)
-        .toList();
-  }
+  Future<List<CategoryModel>> fetchCategories() =>
+      _cachedList(
+        cacheKey: CacheService.kCategories,
+        path: ApiEndpoints.categories,
+        parse: CategoryModel.fromJson,
+      );
 
-  Future<List<BannerModel>> fetchBanners() async {
-    final data = await _client.get<Map<String, dynamic>>(ApiEndpoints.banners);
-    return (data['data'] as List<dynamic>? ?? [])
-        .whereType<Map<String, dynamic>>()
-        .map(BannerModel.fromJson)
-        .toList();
-  }
+  Future<List<BannerModel>> fetchBanners() => _cachedList(
+        cacheKey: CacheService.kHomeBanners,
+        path: ApiEndpoints.banners,
+        parse: BannerModel.fromJson,
+      );
 
   Future<List<ProductModel>> fetchFavorites() =>
       _fetchList(ApiEndpoints.favorites);
@@ -155,5 +166,26 @@ class ProductRepository {
         .whereType<Map<String, dynamic>>()
         .map(ProductModel.fromJson)
         .toList();
+  }
+
+  /// Cache-then-network for a list endpoint: on success, refresh the cache and
+  /// return live data; on network failure, fall back to the last cached copy.
+  Future<List<T>> _cachedList<T>({
+    required String cacheKey,
+    required String path,
+    required T Function(Map<String, dynamic>) parse,
+  }) async {
+    try {
+      final data = await _client.get<Map<String, dynamic>>(path);
+      final raw = (data['data'] as List<dynamic>? ?? [])
+          .whereType<Map<String, dynamic>>()
+          .toList();
+      await CacheService.instance.write(cacheKey, raw);
+      return raw.map(parse).toList();
+    } on ApiException {
+      final cached = CacheService.instance.readList(cacheKey);
+      if (cached != null) return cached.map(parse).toList();
+      rethrow;
+    }
   }
 }

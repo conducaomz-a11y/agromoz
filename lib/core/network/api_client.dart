@@ -109,7 +109,8 @@ class ApiClient {
   Future<T> patch<T>(String path, {Object? data}) =>
       _run(() => _dio.patch<T>(path, data: data));
 
-  Future<T> delete<T>(String path) => _run(() => _dio.delete<T>(path));
+  Future<T> delete<T>(String path, {Object? data}) =>
+      _run(() => _dio.delete<T>(path, data: data));
 
   Future<T> _run<T>(Future<Response<T>> Function() request) async {
     try {

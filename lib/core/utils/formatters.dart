@@ -26,4 +26,7 @@ class Formatters {
   }
 
   static String chatTime(DateTime date) => DateFormat('HH:mm').format(date);
+
+  /// 2026-08-15 → "15/08/2026"
+  static String date(DateTime value) => DateFormat('dd/MM/yyyy').format(value);
 }

@@ -5,6 +5,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/utils/formatters.dart';
+import '../../../data/models/product_model.dart';
 import '../../../providers/base_view_state.dart';
 import '../../../providers/product_detail_provider.dart';
 import '../../../core/utils/contact_launcher.dart';
@@ -167,6 +168,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     style: theme.textTheme.bodyMedium,
                   ),
                 ],
+                if (product.cycle != null) ...[
+                  const SizedBox(height: 16),
+                  _CycleCard(cycle: product.cycle!),
+                ],
                 if (product.description != null) ...[
                   const SizedBox(height: 16),
                   Text('Descrição',
@@ -279,6 +284,97 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
             ),
+    );
+  }
+}
+
+/// Cartão do ciclo de vida (colheita/reposição) com contador de dias.
+class _CycleCard extends StatelessWidget {
+  const _CycleCard({required this.cycle});
+
+  final ProductCycle cycle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Cor conforme o tipo/estado.
+    final Color color;
+    final IconData icon;
+    if (cycle.isSoldOut) {
+      color = theme.colorScheme.error;
+      icon = Icons.cancel_outlined;
+    } else if (cycle.isReady) {
+      color = const Color(0xFF2E7D32);
+      icon = Icons.check_circle_outline;
+    } else {
+      color = cycle.isHarvest ? const Color(0xFF2E7D32) : const Color(0xFF1565C0);
+      icon = cycle.isHarvest ? Icons.local_florist_outlined : Icons.inventory_2_outlined;
+    }
+
+    final days = cycle.daysRemaining;
+    final showCountdown = cycle.isGrowing && days != null && days > 0;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border(left: BorderSide(color: color, width: 5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  cycle.label,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (showCountdown) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  '$days',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  days == 1 ? 'dia restante' : 'dias restantes',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            if (cycle.availableFrom != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Disponível a partir de ${Formatters.date(cycle.availableFrom!)}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
     );
   }
 }

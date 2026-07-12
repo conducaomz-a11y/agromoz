@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
 import '../../core/storage/token_storage.dart';
@@ -91,6 +93,18 @@ class AuthRepository {
     return UserModel.fromJson((data['data'] ?? data) as Map<String, dynamic>);
   }
 
+  /// Uploads a new avatar image and returns the refreshed user.
+  Future<UserModel> uploadAvatar(String imagePath) async {
+    final form = FormData.fromMap({
+      'avatar': await MultipartFile.fromFile(imagePath),
+    });
+    final data = await _client.post<Map<String, dynamic>>(
+      ApiEndpoints.profileAvatar,
+      data: form,
+    );
+    return UserModel.fromJson((data['data'] ?? data) as Map<String, dynamic>);
+  }
+
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -102,6 +116,17 @@ class AuthRepository {
           'new_password': newPassword,
         },
       );
+
+  /// Elimina a conta do utilizador. A API anonimiza a conta e desativa a
+  /// empresa/produtos. Requer a palavra-passe para confirmar. Depois de
+  /// eliminar, limpamos a sessão local.
+  Future<void> deleteAccount({required String password}) async {
+    await _client.delete<void>(
+      ApiEndpoints.profile,
+      data: {'password': password},
+    );
+    await TokenStorage.instance.clear();
+  }
 
   Future<void> logout() async {
     try {

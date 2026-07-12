@@ -198,7 +198,7 @@ class _AvailabilityDropdown extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(.12),
+          color: color.withValues(alpha: .12),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(

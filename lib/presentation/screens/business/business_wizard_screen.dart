@@ -391,7 +391,7 @@ class _BusinessWizardScreenState extends State<BusinessWizardScreen> {
                           ? Theme.of(context)
                               .colorScheme
                               .primaryContainer
-                              .withOpacity(.35)
+                              .withValues(alpha: .35)
                           : null,
                     ),
                     child: Column(

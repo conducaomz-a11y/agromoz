@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/ads/ad_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../routes/app_router.dart';
 
@@ -26,11 +27,23 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _bootstrap() async {
     final auth = context.read<AuthProvider>();
+
+    // Carrega auth + espera mínimo visual (800ms) em paralelo.
+    // O App Open Ad mostra-se ENQUANTO o utilizador espera → experiência fluida.
     await Future.wait([
       auth.bootstrap(),
-      Future.delayed(const Duration(milliseconds: 1400)),
+      Future.delayed(const Duration(milliseconds: 800)),
     ]);
+
     if (!mounted) return;
+
+    // Mostra o App Open Ad depois do splash estar pronto.
+    // O ad sobrepõe-se ao ecrã de carregamento — exatamente como definido
+    // no AdMob para este formato.
+    await AdService.instance.showAppOpenAd();
+
+    if (!mounted) return;
+
     if (auth.status == AuthStatus.authenticated) {
       Navigator.pushReplacementNamed(context, AppRouter.main);
     } else if (!auth.onboardingSeen) {
@@ -62,13 +75,20 @@ class _SplashScreenState extends State<SplashScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.12),
+                    color: Colors.white.withValues(alpha: .12),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.agriculture_rounded,
-                      size: 64, color: Colors.white),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 88,
+                    height: 88,
+                    errorBuilder: (_, __, ___) => const Icon(
+                        Icons.agriculture_rounded,
+                        size: 64,
+                        color: Colors.white),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -83,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 6),
                 Text(
                   'O mercado agrícola de Moçambique',
-                  style: TextStyle(color: Colors.white.withOpacity(.85)),
+                  style: TextStyle(color: Colors.white.withValues(alpha: .85)),
                 ),
               ],
             ),

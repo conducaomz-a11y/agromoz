@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/auth_provider.dart';
+import '../../../providers/business_provider.dart';
 import '../../../routes/app_router.dart';
 
 /// Confirmação da conta com o código de 6 dígitos enviado por e-mail
@@ -53,6 +54,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     final ok = await auth.verifyEmail(widget.identifier, _code.text.trim());
     if (!mounted) return;
     if (ok) {
+      context.read<BusinessProvider>().reset(); // sessão nova, dados frescos
       Navigator.pushNamedAndRemoveUntil(context, AppRouter.main, (_) => false);
       if (widget.wantsBusiness) {
         // Vai directo criar a página de negócio, como no site.

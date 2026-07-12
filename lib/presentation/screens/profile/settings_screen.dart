@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../providers/auth_provider.dart';
 import '../../../providers/theme_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -69,8 +70,138 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+
+          // Conta
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.delete_forever_outlined,
+                      color: Theme.of(context).colorScheme.error),
+                  title: Text('Eliminar conta',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontWeight: FontWeight.w600,
+                      )),
+                  subtitle: const Text('Remove permanentemente a tua conta'),
+                  onTap: () => _confirmDelete(context),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => const _DeleteAccountDialog(),
+    );
+  }
+}
+
+/// Diálogo de confirmação — pede a palavra-passe antes de chamar a API.
+class _DeleteAccountDialog extends StatefulWidget {
+  const _DeleteAccountDialog();
+
+  @override
+  State<_DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
+  final _passwordController = TextEditingController();
+  bool _obscure = true;
+  bool _submitting = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final password = _passwordController.text.trim();
+    if (password.isEmpty) {
+      setState(() => _error = 'Introduz a tua palavra-passe.');
+      return;
+    }
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
+
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.deleteAccount(password);
+
+    if (!mounted) return;
+
+    if (ok) {
+      Navigator.of(context, rootNavigator: true)
+          .pushNamedAndRemoveUntil('/login', (_) => false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('A tua conta foi eliminada.')),
+      );
+    } else {
+      setState(() {
+        _submitting = false;
+        _error = auth.error ?? 'Não foi possível eliminar a conta.';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return AlertDialog(
+      title: const Text('Eliminar conta'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Esta ação é permanente. A tua conta será removida e os teus '
+            'anúncios deixarão de aparecer. Confirma com a tua palavra-passe.',
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _passwordController,
+            obscureText: _obscure,
+            enabled: !_submitting,
+            decoration: InputDecoration(
+              labelText: 'Palavra-passe',
+              errorText: _error,
+              suffixIcon: IconButton(
+                icon: Icon(_obscure
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined),
+                onPressed: () => setState(() => _obscure = !_obscure),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: cs.error),
+          onPressed: _submitting ? null : _submit,
+          child: _submitting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white),
+                )
+              : const Text('Eliminar'),
+        ),
+      ],
     );
   }
 }

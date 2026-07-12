@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/network/api_client.dart';
 import '../core/network/api_exception.dart';
+import '../core/notifications/push_notification_service.dart';
+import '../core/storage/cache_service.dart';
 import '../core/storage/token_storage.dart';
 import '../data/models/user_model.dart';
 import '../data/repositories/auth_repository.dart';
@@ -67,6 +69,8 @@ class AuthProvider extends ChangeNotifier {
         ));
     if (ok) {
       _status = AuthStatus.authenticated;
+      // Tie the FCM device token to this account (best-effort, non-blocking).
+      PushNotificationService.instance.syncAfterLogin();
     } else if (_lastException?.statusCode == 403 &&
         (_lastException?.needsVerification ?? false)) {
       needsVerificationIdentifier =
@@ -123,15 +127,31 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> updateProfile(UserModel updated) =>
       _guard(() async => _user = await _repo.updateProfile(updated));
 
+  Future<bool> uploadAvatar(String imagePath) =>
+      _guard(() async => _user = await _repo.uploadAvatar(imagePath));
+
   Future<bool> changePassword(String current, String next) => _guard(
         () => _repo.changePassword(currentPassword: current, newPassword: next),
       );
 
   Future<void> logout() async {
     await _repo.logout();
+    await CacheService.instance.clear();
     _user = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
+  }
+
+  /// Elimina a conta e termina a sessão localmente. Devolve true se correu bem.
+  Future<bool> deleteAccount(String password) async {
+    final ok = await _guard(() => _repo.deleteAccount(password: password));
+    if (ok) {
+      await CacheService.instance.clear();
+      _user = null;
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+    }
+    return ok;
   }
 
   void _handleSessionExpired() {

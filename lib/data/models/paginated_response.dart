@@ -13,6 +13,11 @@ class PaginatedResponse<T> {
 
   bool get hasMore => currentPage < lastPage;
 
+  /// Resposta vazia — útil como fallback quando uma chamada falha mas não
+  /// deve partir o resto do ecrã.
+  factory PaginatedResponse.empty() =>
+      PaginatedResponse(items: const [], currentPage: 1, lastPage: 1);
+
   factory PaginatedResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromJson,
